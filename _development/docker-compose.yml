@@ -4,21 +4,9 @@ services:
 
   lezzet_py:
     extends:
-      file: ../Lezzetly/_development/docker-compose.yml
+      file: ../../../Lezzetly/_development/docker-compose.yml
       service: db
 
-  # db:
-  #   image: postgres
-  #   restart: always
-  #   ports:
-  #     - 5433:5432
-  #   volumes:
-  #     - ./pgdb:/var/lib/postgresql/data
-  #   environment:
-  #     POSTGRES_DB: db_name
-  #     POSTGRES_USER: lezzetly
-  #     POSTGRES_HOST_AUTH_METHOD: trust
-    # env_file: ./.env
 
 
   adminer:

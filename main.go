@@ -76,8 +76,10 @@ func updateClient(w http.ResponseWriter, r *http.Request){
 	id64, _ := strconv.ParseUint(requestId, 10, 64)
 	var updatedclient Client
 	json.NewDecoder(r.Body).Decode(&updatedclient)
-	for _, item := range clients{
+	fmt.Println(clients, "clientsss")
+	for i, item := range clients{
 		if item.ID == uint(id64){
+			fmt.Println(i, "iiiii")
 			updatedclient.ID = uint(id64)  //set id from params, same id as previous
 			db.Save(updatedclient)
 			json.NewEncoder(w).Encode(updatedclient)
@@ -110,7 +112,8 @@ func main(){
 		log.Println("Connection Established")
 	}
 	
-
+	clients = append(clients, Client{ID: 1, FirstName: "Nermin", LastName: "Chicken wings", Patronymic: "Khan"},
+	Client{ID: 2, FirstName: "Fuad", LastName: "Yarpaq dolmasi", Patronymic: "Abdulla"})
 
 	// Create the database. This is a one-time step.
     // Comment out if running multiple times - You may see an error otherwise
