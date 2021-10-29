@@ -1,0 +1,26 @@
+version: '3.1'
+
+services:
+
+  postgres_db:
+    extends:
+      file: ../Lezzetly/docker-compose.yml
+      service: postgres
+    container_name: postgres_db
+  
+  app:
+    container_name: client_app
+    build: .
+    ports:
+      - 8004:8000
+    restart: on-failure
+    volumes:
+        - .:/code/
+    depends_on:
+        - postgres_db
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080

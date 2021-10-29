@@ -128,5 +128,5 @@ func main(){
 	router.HandleFunc("/api/v1.0/clients/{id}", updateClient).Methods("PUT")
 	router.HandleFunc("/api/v1.0/clients/{id}", deleteClient).Methods("DELETE")
 
-	log.Fatal(http.ListenAndServe(":5000", router))
+	log.Fatal(http.ListenAndServe(":8000", router))
 }
