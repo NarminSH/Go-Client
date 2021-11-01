@@ -10,6 +10,7 @@ services:
 
   postgres:
     image: postgres:9.6.6
+    container_name: client_postgres_1
     restart: always
     volumes:
         - ./pgdb/:/var/lib/postgresql/

@@ -63,23 +63,18 @@ func createClient(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode((newClient))
 }
 
+
 func updateClient(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)
 	requestId := params["id"]
 	id64, _ := strconv.ParseUint(requestId, 10, 64)
+	idToUpdate := uint(id64)
 	var updatedclient Client
 	json.NewDecoder(r.Body).Decode(&updatedclient)
-	fmt.Println(clients, "clientsss")
-	for i, item := range clients {
-		if item.ID == uint(id64) {
-			fmt.Println(i, "iiiii")
-			updatedclient.ID = uint(id64) //set id from params, same id as previous
-			db.Save(updatedclient)
-			json.NewEncoder(w).Encode(updatedclient)
-			return
-		}
-	}
+	updatedclient.ID = idToUpdate
+	db.Where("id = ?", idToUpdate).Save(&updatedclient)
+	json.NewEncoder(w).Encode(updatedclient)
 }
 
 func deleteClient(w http.ResponseWriter, r *http.Request) {
@@ -92,8 +87,12 @@ func deleteClient(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
+
+// host=client_postgres_1 - local - server
+// host=localhost - local development
+// host=192.168.31.74 - production
 func main() {
-	db, err = gorm.Open("postgres", "host=client_postgres_1 user=lezzetly password=lezzetly123 dbname=db_name port=5432 sslmode=disable Timezone=Asia/Baku")
+	db, err = gorm.Open("postgres", "host=192.168.31.74 user=lezzetly password=lezzetly123 dbname=db_name port=5432 sslmode=disable Timezone=Asia/Baku")
 
 	if err != nil {
 		fmt.Println(err, "error is  here")
@@ -101,9 +100,6 @@ func main() {
 	} else {
 		log.Println("Connection Established")
 	}
-
-	clients = append(clients, Client{ID: 1, FirstName: "Nermin", LastName: "Chicken wings", Patronymic: "Khan"},
-		Client{ID: 2, FirstName: "Fuad", LastName: "Yarpaq dolmasi", Patronymic: "Abdulla"})
 
 	// Create the database. This is a one-time step.
 	// Comment out if running multiple times - You may see an error otherwise
