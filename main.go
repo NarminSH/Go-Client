@@ -8,31 +8,38 @@ import (
 	"log" //error handling
 	"net/http"
 	"strconv"
-	"time"
+	"clientapi/models"
+	"clientapi/middleware"
 
 	"github.com/gorilla/mux" // client/server functionality
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
+	_ "clientapi/docs" 
+	
+	httpSwagger "github.com/swaggo/http-swagger"
 )
+
+
+
+
 
 var db *gorm.DB
 var err error
 
-type Client struct {
-	ID          uint   `json:"id" gorm:"primary_key"` //properties
-	FirstName   string `json:"firstname" gorm:"type:varchar(50)"`
-	LastName    string `json:"lastname" gorm:"type:varchar(50)"`
-	Patronymic  string `json:"patronymic" gorm:"type:varchar(70)"`
-	Username    string `json:"username" gorm:"type:varchar(70)"`
-	PhoneNumber string `json:"phone_number" gorm:"type:varchar(70)"`
-	Email       string `json:"email" gorm:"type:varchar(100)"`
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
-}
-
 //slice named clients inherits from Client struct
-var clients []Client
+var clients []models.Client
 
+
+
+
+// GetClients godoc
+// @Summary Get  all clients
+// @Description Get  all clients
+// @Tags Clients
+// @Accept  json
+// @Produce  json
+// @Success 200 {array} models.Client
+// @Router /clients [get]
 func getCLients(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	db.Find(&clients)
@@ -40,22 +47,36 @@ func getCLients(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// @Summary Get one client
+// @Description get client by ID
+// @Tags Clients
+// @Param id path string false "Client ID"
+// @Success 200 {object} models.Client
+// @Failure 400,404 {object} object
+// @Router /clients/{id} [get]
 func getClient(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)
 	id := params["id"]
-	var client Client
+	var client models.Client
 	db.First(&client, id)
 	json.NewEncoder(w).Encode(client)
 }
 
-// http.ResponseWriter -  contains the response details(headers, payload)
-// http.Request -  contains the incoming request details
 
+// CreateClient godoc
+// @Summary Create a new client
+// @Description Create a new client with the input paylod
+// @Tags Clients
+// @Accept  json
+// @Produce  json
+// @Param newClient body models.Client false "Create client"
+// @Success 200 {object} models.Client
+// @Router /clients [post]
 func createClient(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("worked create")
 	w.Header().Set("Content-Type", "application/json")
-	var newClient Client
+	var newClient models.Client
 	json.NewDecoder(r.Body).Decode(&newClient)
 	// newClient.ID = strconv.Itoa(len(clients) + 1)
 	// clients = append(clients, newClient)
@@ -64,26 +85,47 @@ func createClient(w http.ResponseWriter, r *http.Request) {
 }
 
 
+// UpdateClient godoc
+// @Summary Update particular client
+// @Description Update particular client by id
+// @Tags Clients
+// @Accept  json
+// @Produce  json
+// @Param updatedclient body models.Client false "Update Client"
+// @Success 200 {object} models.Client
+// @Failure 400,404 {object} object
+// @Router /clients/{id} [put]
 func updateClient(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)
 	requestId := params["id"]
 	id64, _ := strconv.ParseUint(requestId, 10, 64)
 	idToUpdate := uint(id64)
-	var updatedclient Client
+	var updatedclient models.Client
 	json.NewDecoder(r.Body).Decode(&updatedclient)
 	updatedclient.ID = idToUpdate
 	db.Where("id = ?", idToUpdate).Save(&updatedclient)
 	json.NewEncoder(w).Encode(updatedclient)
 }
 
+
+// DeleteClient godoc
+// @Summary Delete particular client
+// @Description Delete particular client by id
+// @Tags Clients
+// @Accept  json
+// @Produce  json
+// @Param idToDelete body models.Client false "Delete Client"
+// @Success 200 {object} models.Client
+// @Failure 400,404 {object} object
+// @Router /clients/{id} [delete]
 func deleteClient(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)
 	requestId := params["id"]
 	id64, _ := strconv.ParseUint(requestId, 10, 64)
 	idToDelete := uint(id64)
-	db.Where("id = ?", idToDelete).Delete(&Client{})
+	db.Where("id = ?", idToDelete).Delete(&models.Client{})
 	w.WriteHeader(http.StatusOK)
 }
 
@@ -91,11 +133,19 @@ func deleteClient(w http.ResponseWriter, r *http.Request) {
 // host=client_postgres_1 - local - server
 // host=localhost - local development
 // host=192.168.31.74 - production
+
+// @title Clients API
+// @version 1.0
+// @description This is a sample serice for managing clients
+// @termsOfService http://swagger.io/terms/
+
+// @host localhost:8000
+// @BasePath /
 func main() {
-	db, err = gorm.Open("postgres", "host=192.168.31.74 user=lezzetly password=lezzetly123 dbname=db_name port=5432 sslmode=disable Timezone=Asia/Baku")
+	db, err = gorm.Open("postgres", "host=localhost user=lezzetly password=lezzetly123 dbname=db_name port=5432 sslmode=disable Timezone=Asia/Baku")
 
 	if err != nil {
-		fmt.Println(err, "error is  here")
+		fmt.Println(err, "Error is  here")
 		log.Println("Connection Failed to Open")
 	} else {
 		log.Println("Connection Established")
@@ -105,14 +155,16 @@ func main() {
 	// Comment out if running multiple times - You may see an error otherwise
 	// db.Exec("CREATE DATABASE client_db")
 	// db.Exec("USE client_db")
-	db.AutoMigrate(&Client{})
+	db.AutoMigrate(&models.Client{})
 
 	router := mux.NewRouter()
 	router.HandleFunc("/api/v1.0/clients", getCLients).Methods("GET")
 	router.HandleFunc("/api/v1.0/clients/{id}", getClient).Methods("GET")
 	router.HandleFunc("/api/v1.0/clients", createClient).Methods("POST")
-	router.HandleFunc("/api/v1.0/clients/{id}", updateClient).Methods("PUT")
-	router.HandleFunc("/api/v1.0/clients/{id}", deleteClient).Methods("DELETE")
+	router.HandleFunc("/api/v1.0/clients/{id}", middleware.IsAuthorized(updateClient)).Methods("PUT")
+	router.HandleFunc("/api/v1.0/clients/{id}", middleware.IsAuthorized(deleteClient)).Methods("DELETE")
 
+	router.PathPrefix("/swagger").Handler(httpSwagger.WrapHandler)
 	log.Fatal(http.ListenAndServe(":8000", router))
+
 }
