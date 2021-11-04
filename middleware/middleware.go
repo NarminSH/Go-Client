@@ -11,6 +11,14 @@ import (
 )
 
 
+type tokenClaims struct {
+	jwt.StandardClaims
+	UserId int `json:"user_id"`
+	UserType int `json:"user_usertype"`
+	UserName string `json:"user_username"`
+	IsFull bool `json:"user_isfull"`
+}
+
 var (
 	router *mux.Router
 	secretkey string = "secretkeyjwt"
@@ -42,44 +50,44 @@ func IsAuthorized(handler http.HandlerFunc) http.HandlerFunc {
 		stringToken := r.Header["Authorization"][0]
 		split :=strings.Split(stringToken, " ")
 		responseToken := split[1]
-		// if responseToken == "" {
-		// 	var err Error
-		// 	err = SetError(err, "No Token Found")
-		// 	json.NewEncoder(w).Encode(err)
-		// 	return
-		// }
 
 		var mySigningKey = []byte(secretkey)
 
 		token, err := jwt.Parse(responseToken, func(token *jwt.Token) (interface{}, error) {
-			fmt.Println(token, "121211212")
+			fmt.Println(token, "Parsed token is over here")
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 				return nil, fmt.Errorf("There was an error in parsing token.")
 			}
 			return mySigningKey, nil
 		})
 
-		if err == nil {
-			var err Error
-			fmt.Println(err, "errrooorrrrr")
-			err = SetError(err, "Your Token has been expired.")
-			json.NewEncoder(w).Encode(err)
-			return
-		}
+		// if err != nil {
+		// 	var err Error
+		// 	fmt.Println(err, "errrooorrrrr")
+		// 	err = SetError(err, "Your Token has been expired.")
+		// 	json.NewEncoder(w).Encode(err)
+		// 	return
+		// }
 
-		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-			if claims["role"] == "admin" {
-				r.Header.Set("Role", "admin")
+
+		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid{
+			fmt.Println(claims, "claimsss are here")
+			params := mux.Vars(r)
+			requestUser := params["username"]
+			if claims["iss"] == requestUser  {
+				fmt.Printf("User is %s ", requestUser)
+				// r.Header.Set("iss", "nermin")
 				handler.ServeHTTP(w, r)
 				return
-
-			} else if claims["role"] == "user" {
-				r.Header.Set("Role", "user")
-				handler.ServeHTTP(w, r)
+			}else{
+				fmt.Println("User is not same with updated user")
+				var err Error
+				err = SetError(err, "You can not update the client")
+				json.NewEncoder(w).Encode(err)
 				return
-
 			}
 		}
+
 		var reserr Error
 		reserr = SetError(reserr, "Not Authorized.")
 		json.NewEncoder(w).Encode(err)

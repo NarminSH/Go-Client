@@ -98,13 +98,13 @@ func createClient(w http.ResponseWriter, r *http.Request) {
 func updateClient(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)
-	requestId := params["id"]
-	id64, _ := strconv.ParseUint(requestId, 10, 64)
-	idToUpdate := uint(id64)
+	requestUser := params["username"]
+	// id64, _ := strconv.ParseUint(requestId, 10, 64)
+	// idToUpdate := uint(id64)
 	var updatedclient models.Client
 	json.NewDecoder(r.Body).Decode(&updatedclient)
-	updatedclient.ID = idToUpdate
-	db.Where("id = ?", idToUpdate).Save(&updatedclient)
+	updatedclient.Username = requestUser
+	db.Where("username = ?", requestUser).Save(&updatedclient)
 	json.NewEncoder(w).Encode(updatedclient)
 }
 
@@ -142,7 +142,7 @@ func deleteClient(w http.ResponseWriter, r *http.Request) {
 // @host localhost:8000
 // @BasePath /
 func main() {
-	db, err = gorm.Open("postgres", "host=192.168.31.74 user=lezzetly password=lezzetly123 dbname=db_name port=5432 sslmode=disable Timezone=Asia/Baku")
+	db, err = gorm.Open("postgres", "host=localhost user=lezzetly password=lezzetly123 dbname=db_name port=5432 sslmode=disable Timezone=Asia/Baku")
 
 	if err != nil {
 		fmt.Println(err, "Error is  here")
@@ -161,7 +161,7 @@ func main() {
 	router.HandleFunc("/api/v1.0/clients", getCLients).Methods("GET")
 	router.HandleFunc("/api/v1.0/clients/{id}", getClient).Methods("GET")
 	router.HandleFunc("/api/v1.0/clients", createClient).Methods("POST")
-	router.HandleFunc("/api/v1.0/clients/{id}", middleware.IsAuthorized(updateClient)).Methods("PUT")
+	router.HandleFunc("/api/v1.0/clients/{username}", middleware.IsAuthorized(updateClient)).Methods("PUT")
 	router.HandleFunc("/api/v1.0/clients/{id}", middleware.IsAuthorized(deleteClient)).Methods("DELETE")
 
 	router.PathPrefix("/swagger").Handler(httpSwagger.WrapHandler)
