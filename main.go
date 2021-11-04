@@ -7,7 +7,6 @@ import (
 
 	"log" //error handling
 	"net/http"
-	"strconv"
 	"clientapi/models"
 	"clientapi/middleware"
 
@@ -122,10 +121,10 @@ func updateClient(w http.ResponseWriter, r *http.Request) {
 func deleteClient(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)
-	requestId := params["id"]
-	id64, _ := strconv.ParseUint(requestId, 10, 64)
-	idToDelete := uint(id64)
-	db.Where("id = ?", idToDelete).Delete(&models.Client{})
+	requestUser := params["username"]
+	// id64, _ := strconv.ParseUint(requestId, 10, 64)
+	// idToDelete := uint(id64)
+	db.Where("username = ?", requestUser).Delete(&models.Client{})
 	w.WriteHeader(http.StatusOK)
 }
 
