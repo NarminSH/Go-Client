@@ -85,6 +85,8 @@ func createClient(w http.ResponseWriter, r *http.Request) {
 }
 
 
+
+
 // UpdateClient godoc
 // @Summary Update particular client
 // @Description Update particular client by id
@@ -107,6 +109,8 @@ func updateClient(w http.ResponseWriter, r *http.Request) {
 	db.Where("username = ?", requestUser).Save(&updatedclient)
 	json.NewEncoder(w).Encode(updatedclient)
 }
+
+
 
 
 // DeleteClient godoc
@@ -202,7 +206,7 @@ func deleteClient(w http.ResponseWriter, r *http.Request) {
 // @host localhost:8000
 // @BasePath /
 func main() {
-	db, err = gorm.Open("postgres", "host=192.168.31.74 user=lezzetly password=lezzetly123 dbname=db_name port=5432 sslmode=disable Timezone=Asia/Baku")
+	db, err = gorm.Open("postgres", "host=localhost user=lezzetly password=lezzetly123 dbname=db_name port=5432 sslmode=disable Timezone=Asia/Baku")
 
 	if err != nil {
 		fmt.Println(err, "Error is  here")
