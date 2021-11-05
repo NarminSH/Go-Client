@@ -21,7 +21,7 @@ definitions:
       username:
         type: string
     type: object
-host: localhost:8000
+host: 192.168.31.74:8004
 info:
   contact: {}
   description: This is a sample serice for managing clients

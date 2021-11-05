@@ -234,7 +234,7 @@ func deleteClient(w http.ResponseWriter, r *http.Request) {
 // @description This is a sample serice for managing clients
 // @termsOfService http://swagger.io/terms/
 
-// @host localhost:8000
+// @host 192.168.31.74:8004
 // @BasePath /
 func main() {
 	db, err = gorm.Open("postgres", "host=192.168.31.74 user=lezzetly password=lezzetly123 dbname=db_name port=5432 sslmode=disable Timezone=Asia/Baku")
