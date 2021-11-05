@@ -5,16 +5,17 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"clientapi/middleware"
+	"clientapi/models"
 	"log" //error handling
 	"net/http"
-	"clientapi/models"
-	"clientapi/middleware"
+
+	_ "clientapi/docs"
 
 	"github.com/gorilla/mux" // client/server functionality
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
-	_ "clientapi/docs" 
-	
+
 	httpSwagger "github.com/swaggo/http-swagger"
 )
 
@@ -129,6 +130,66 @@ func deleteClient(w http.ResponseWriter, r *http.Request) {
 }
 
 
+
+// // Orders
+// func createOrder(w http.ResponseWriter, r *http.Request) {
+// 	var neworder models.Order
+// 	json.NewDecoder(r.Body).Decode(&neworder)
+// 	// Creates new order by inserting records in the `orders` and `items` table
+// 	db.Create(&neworder)
+// 	w.Header().Set("Content-Type", "application/json")
+// 	json.NewEncoder(w).Encode(neworder)
+// }
+
+
+// func getOrders(w http.ResponseWriter, r *http.Request) {
+// 	w.Header().Set("Content-Type", "application/json")
+// 	var orders []models.Order
+// 	db.Preload("Items").Find(&orders)
+// 	json.NewEncoder(w).Encode(orders)
+// }
+
+
+
+// func getOrder(w http.ResponseWriter, r *http.Request) {
+// 	w.Header().Set("Content-Type", "application/json")
+// 	params := mux.Vars(r)
+// 	inputOrderID := params["orderId"]
+
+// 	var order models.Order
+// 	db.Preload("Items").First(&order, inputOrderID)
+// 	json.NewEncoder(w).Encode(order)
+// }
+
+// // func updateOrder(w http.ResponseWriter, r *http.Request) {
+// // 	var updatedOrder models.Order
+// // 	json.NewDecoder(r.Body).Decode(&updatedOrder)
+// // 	db.Save(&updatedOrder)
+
+// // 	w.Header().Set("Content-Type", "application/json")
+// // 	json.NewEncoder(w).Encode(updatedOrder)
+// // }
+
+// // Orders
+// func createItem(w http.ResponseWriter, r *http.Request) {
+// 	var newItem models.Item
+// 	json.NewDecoder(r.Body).Decode(&newItem)
+// 	// Creates new order by inserting records in the `orders` and `items` table
+// 	db.Create(&newItem)
+// 	w.Header().Set("Content-Type", "application/json")
+// 	json.NewEncoder(w).Encode(newItem)
+// }
+
+
+
+
+
+
+
+
+
+
+
 // host=client_postgres_1 - local - server
 // host=localhost - local development
 // host=192.168.31.74 - production
@@ -141,7 +202,7 @@ func deleteClient(w http.ResponseWriter, r *http.Request) {
 // @host localhost:8000
 // @BasePath /
 func main() {
-	db, err = gorm.Open("postgres", "host=localhost user=lezzetly password=lezzetly123 dbname=db_name port=5432 sslmode=disable Timezone=Asia/Baku")
+	db, err = gorm.Open("postgres", "host=192.168.31.74 user=lezzetly password=lezzetly123 dbname=db_name port=5432 sslmode=disable Timezone=Asia/Baku")
 
 	if err != nil {
 		fmt.Println(err, "Error is  here")
@@ -162,8 +223,14 @@ func main() {
 	router.HandleFunc("/api/v1.0/clients", createClient).Methods("POST")
 	router.HandleFunc("/api/v1.0/clients/{username}", middleware.IsAuthorized(updateClient)).Methods("PUT")
 	router.HandleFunc("/api/v1.0/clients/{id}", middleware.IsAuthorized(deleteClient)).Methods("DELETE")
+	// router.HandleFunc("/api/v1.0/orders", getOrders).Methods("GET")
+	// router.HandleFunc("/api/v1.0/orders", createOrder).Methods("POST")
+	// router.HandleFunc("/api/v1.0/orders/{orderId}", getOrder).Methods("GET")
+	// router.HandleFunc("/api/v1.0/orderitems", createItem).Methods("POST")
+
 
 	router.PathPrefix("/swagger").Handler(httpSwagger.WrapHandler)
 	log.Fatal(http.ListenAndServe(":8000", router))
+
 
 }
