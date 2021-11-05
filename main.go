@@ -32,9 +32,6 @@ var err error
 var clients []models.Client
 
 
-var result struct {
-	Found bool
-  }
 
 
   type Succesful struct {
@@ -51,7 +48,7 @@ func SetSuccess(success Succesful, message string) Succesful {
 
 
 // GetClients godoc
-// @Summary Get  all clients
+// @Summary Get   all clients
 // @Description Get  all clients
 // @Tags Clients
 // @Accept  json
@@ -66,9 +63,9 @@ func getCLients(w http.ResponseWriter, r *http.Request) {
 }
 
 // @Summary Get one client
-// @Description get client by ID
+// @Description get client by username
 // @Tags Clients
-// @Param id path string false "Client ID"
+// @Param username path string true "Client username"
 // @Success 200 {object} models.Client
 // @Failure 400,404 {object} object
 // @Router /clients/{username} [get]
@@ -89,9 +86,11 @@ func getClient(w http.ResponseWriter, r *http.Request) {
 // @Tags Clients
 // @Accept  json
 // @Produce  json
-// @Param newClient body models.Client false "Create client"
+// @Param newClient body models.Client true "Create client"
 // @Success 200 {object} models.Client
+// @Failure 400,404 {object} object
 // @Router /clients [post]
+// @Security ApiKeyAuth
 func createClient(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("worked create")
 	w.Header().Set("Content-Type", "application/json")
@@ -150,14 +149,16 @@ func createClient(w http.ResponseWriter, r *http.Request) {
 
 // UpdateClient godoc
 // @Summary Update particular client
-// @Description Update particular client by id
+// @Description Update particular client by username 
 // @Tags Clients
 // @Accept  json
 // @Produce  json
-// @Param updatedclient body models.Client false "Update Client"
+// @Param username path string true "Client username"
+// @Param updatedclient body models.Client true "Update Client"
 // @Success 200 {object} models.Client
 // @Failure 400,404 {object} object
 // @Router /clients/{username} [put]
+// @Security ApiKeyAuth
 func updateClient(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)
@@ -177,14 +178,15 @@ func updateClient(w http.ResponseWriter, r *http.Request) {
 
 // DeleteClient godoc
 // @Summary Delete particular client
-// @Description Delete particular client by id
+// @Description Delete particular client by username
 // @Tags Clients
 // @Accept  json
 // @Produce  json
-// @Param idToDelete body models.Client false "Delete Client"
+// @Param username path string true "Client username"
 // @Success 200 {object} models.Client
 // @Failure 400,404 {object} object
 // @Router /clients/{username} [delete]
+// @Security ApiKeyAuth
 func deleteClient(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)
@@ -267,13 +269,17 @@ func deleteClient(w http.ResponseWriter, r *http.Request) {
 
 // @title Clients API
 // @version 1.0
-// @description This is a sample serice for managing clients
-// @termsOfService http://swagger.io/terms/
+// @description This is a sample service for managing clients
 
-// @host 192.168.31.74:8004
+
+//@securityDefinitions.apikey ApiKeyAuth
+//@in header
+//@name Authorization
+
+// @host localhost:8000/api/v1.0
 // @BasePath /
 func main() {
-	db, err = gorm.Open("postgres", "host=192.168.31.74  user=lezzetly password=lezzetly123 dbname=db_name port=5432 sslmode=disable Timezone=Asia/Baku")
+	db, err = gorm.Open("postgres", "host=localhost  user=lezzetly password=lezzetly123 dbname=db_name port=5432 sslmode=disable Timezone=Asia/Baku")
 
 	if err != nil {
 		fmt.Println(err, "Error is  here")

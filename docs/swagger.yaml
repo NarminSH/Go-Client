@@ -21,11 +21,10 @@ definitions:
       username:
         type: string
     type: object
-host: 192.168.31.74:8004
+host: localhost:8000/api/v1.0
 info:
   contact: {}
-  description: This is a sample serice for managing clients
-  termsOfService: http://swagger.io/terms/
+  description: This is a sample service for managing clients
   title: Clients API
   version: "1.0"
 paths:
@@ -43,7 +42,7 @@ paths:
             items:
               $ref: '#/definitions/models.Client'
             type: array
-      summary: Get  all clients
+      summary: Get   all clients
       tags:
       - Clients
     post:
@@ -54,27 +53,7 @@ paths:
       - description: Create client
         in: body
         name: newClient
-        schema:
-          $ref: '#/definitions/models.Client'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.Client'
-      summary: Create a new client
-      tags:
-      - Clients
-  /clients/{username}:
-    delete:
-      consumes:
-      - application/json
-      description: Delete particular client by id
-      parameters:
-      - description: Delete Client
-        in: body
-        name: idToDelete
+        required: true
         schema:
           $ref: '#/definitions/models.Client'
       produces:
@@ -92,15 +71,49 @@ paths:
           description: Not Found
           schema:
             type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Create a new client
+      tags:
+      - Clients
+  /clients/{username}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete particular client by username
+      parameters:
+      - description: Client username
+        in: path
+        name: username
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Client'
+        "400":
+          description: Bad Request
+          schema:
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            type: object
+      security:
+      - ApiKeyAuth: []
       summary: Delete particular client
       tags:
       - Clients
     get:
-      description: get client by ID
+      description: get client by username
       parameters:
-      - description: Client ID
+      - description: Client username
         in: path
-        name: id
+        name: username
+        required: true
         type: string
       responses:
         "200":
@@ -121,11 +134,17 @@ paths:
     put:
       consumes:
       - application/json
-      description: Update particular client by id
+      description: Update particular client by username
       parameters:
+      - description: Client username
+        in: path
+        name: username
+        required: true
+        type: string
       - description: Update Client
         in: body
         name: updatedclient
+        required: true
         schema:
           $ref: '#/definitions/models.Client'
       produces:
@@ -143,7 +162,14 @@ paths:
           description: Not Found
           schema:
             type: object
+      security:
+      - ApiKeyAuth: []
       summary: Update particular client
       tags:
       - Clients
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

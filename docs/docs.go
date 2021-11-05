@@ -17,7 +17,6 @@ var doc = `{
     "info": {
         "description": "{{escape .Description}}",
         "title": "{{.Title}}",
-        "termsOfService": "http://swagger.io/terms/",
         "contact": {},
         "version": "{{.Version}}"
     },
@@ -36,7 +35,7 @@ var doc = `{
                 "tags": [
                     "Clients"
                 ],
-                "summary": "Get  all clients",
+                "summary": "Get   all clients",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -50,6 +49,11 @@ var doc = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Create a new client with the input paylod",
                 "consumes": [
                     "application/json"
@@ -66,6 +70,7 @@ var doc = `{
                         "description": "Create client",
                         "name": "newClient",
                         "in": "body",
+                        "required": true,
                         "schema": {
                             "$ref": "#/definitions/models.Client"
                         }
@@ -77,13 +82,25 @@ var doc = `{
                         "schema": {
                             "$ref": "#/definitions/models.Client"
                         }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object"
+                        }
                     }
                 }
             }
         },
         "/clients/{username}": {
             "get": {
-                "description": "get client by ID",
+                "description": "get client by username",
                 "tags": [
                     "Clients"
                 ],
@@ -91,9 +108,10 @@ var doc = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Client ID",
-                        "name": "id",
-                        "in": "path"
+                        "description": "Client username",
+                        "name": "username",
+                        "in": "path",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -118,7 +136,12 @@ var doc = `{
                 }
             },
             "put": {
-                "description": "Update particular client by id",
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Update particular client by username",
                 "consumes": [
                     "application/json"
                 ],
@@ -131,9 +154,17 @@ var doc = `{
                 "summary": "Update particular client",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "Client username",
+                        "name": "username",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
                         "description": "Update Client",
                         "name": "updatedclient",
                         "in": "body",
+                        "required": true,
                         "schema": {
                             "$ref": "#/definitions/models.Client"
                         }
@@ -161,7 +192,12 @@ var doc = `{
                 }
             },
             "delete": {
-                "description": "Delete particular client by id",
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Delete particular client by username",
                 "consumes": [
                     "application/json"
                 ],
@@ -174,12 +210,11 @@ var doc = `{
                 "summary": "Delete particular client",
                 "parameters": [
                     {
-                        "description": "Delete Client",
-                        "name": "idToDelete",
-                        "in": "body",
-                        "schema": {
-                            "$ref": "#/definitions/models.Client"
-                        }
+                        "type": "string",
+                        "description": "Client username",
+                        "name": "username",
+                        "in": "path",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -238,6 +273,13 @@ var doc = `{
                 }
             }
         }
+    },
+    "securityDefinitions": {
+        "ApiKeyAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
     }
 }`
 
@@ -253,11 +295,11 @@ type swaggerInfo struct {
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = swaggerInfo{
 	Version:     "1.0",
-	Host:        "192.168.31.74:8004",
+	Host:        "localhost:8000/api/v1.0",
 	BasePath:    "/",
 	Schemes:     []string{},
 	Title:       "Clients API",
-	Description: "This is a sample serice for managing clients",
+	Description: "This is a sample service for managing clients",
 }
 
 type s struct{}
