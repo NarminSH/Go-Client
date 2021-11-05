@@ -55,7 +55,7 @@ func getCLients(w http.ResponseWriter, r *http.Request) {
 // @Param id path string false "Client ID"
 // @Success 200 {object} models.Client
 // @Failure 400,404 {object} object
-// @Router /clients/{id} [get]
+// @Router /clients/{username} [get]
 func getClient(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)
@@ -125,7 +125,7 @@ func createClient(w http.ResponseWriter, r *http.Request) {
 // @Param updatedclient body models.Client false "Update Client"
 // @Success 200 {object} models.Client
 // @Failure 400,404 {object} object
-// @Router /clients/{id} [put]
+// @Router /clients/{username} [put]
 func updateClient(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)
@@ -152,7 +152,7 @@ func updateClient(w http.ResponseWriter, r *http.Request) {
 // @Param idToDelete body models.Client false "Delete Client"
 // @Success 200 {object} models.Client
 // @Failure 400,404 {object} object
-// @Router /clients/{id} [delete]
+// @Router /clients/{username} [delete]
 func deleteClient(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)
@@ -237,7 +237,7 @@ func deleteClient(w http.ResponseWriter, r *http.Request) {
 // @host localhost:8000
 // @BasePath /
 func main() {
-	db, err = gorm.Open("postgres", "host=192.168.31.74 user=lezzetly password=lezzetly123 dbname=db_name port=5432 sslmode=disable Timezone=Asia/Baku")
+	db, err = gorm.Open("postgres", "host=localhost user=lezzetly password=lezzetly123 dbname=db_name port=5432 sslmode=disable Timezone=Asia/Baku")
 
 	if err != nil {
 		fmt.Println(err, "Error is  here")

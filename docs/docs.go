@@ -81,7 +81,7 @@ var doc = `{
                 }
             }
         },
-        "/clients/{id}": {
+        "/clients/{username}": {
             "get": {
                 "description": "get client by ID",
                 "tags": [
