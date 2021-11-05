@@ -6,7 +6,7 @@
         "contact": {},
         "version": "1.0"
     },
-    "host": "192.168.31.74:8004",
+    "host": "192.168.31.74:8004/api/v1.0",
     "basePath": "/",
     "paths": {
         "/clients": {
