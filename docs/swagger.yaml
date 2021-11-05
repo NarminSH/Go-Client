@@ -21,7 +21,7 @@ definitions:
       username:
         type: string
     type: object
-host: 192.168.31.74:8004/api/v1.0
+host: 192.168.31.74:8004
 info:
   contact: {}
   description: This is a sample service for managing clients
