@@ -206,7 +206,7 @@ func deleteClient(w http.ResponseWriter, r *http.Request) {
 // @host localhost:8000
 // @BasePath /
 func main() {
-	db, err = gorm.Open("postgres", "host=192.168.31.74 user=lezzetly password=lezzetly123 dbname=db_name port=5432 sslmode=disable Timezone=Asia/Baku")
+	db, err = gorm.Open("postgres", "host=localhost user=lezzetly password=lezzetly123 dbname=db_name port=5432 sslmode=disable Timezone=Asia/Baku")
 
 	if err != nil {
 		fmt.Println(err, "Error is  here")
@@ -217,8 +217,8 @@ func main() {
 
 	// Create the database. This is a one-time step.
 	// Comment out if running multiple times - You may see an error otherwise
-	db.Exec("CREATE DATABASE client_db")
-	db.Exec("USE client_db")
+	// db.Exec("CREATE DATABASE client_db")
+	// db.Exec("USE client_db")
 	db.AutoMigrate(&models.Client{})
 
 	router := mux.NewRouter()
