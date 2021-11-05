@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"reflect"
 	"strings"
 
 	"github.com/dgrijalva/jwt-go"
@@ -21,7 +22,7 @@ type tokenClaims struct {
 
 var (
 	router *mux.Router
-	secretkey string = "secretkeyjwt"
+	Secretkey string = "secretkeyjwt"
   )
 
 
@@ -51,7 +52,7 @@ func IsAuthorized(handler http.HandlerFunc) http.HandlerFunc {
 		split :=strings.Split(stringToken, " ")
 		responseToken := split[1]
 
-		var mySigningKey = []byte(secretkey)
+		var mySigningKey = []byte(Secretkey)
 
 		token, err := jwt.Parse(responseToken, func(token *jwt.Token) (interface{}, error) {
 			fmt.Println(token, "Parsed token is over here")
@@ -69,22 +70,41 @@ func IsAuthorized(handler http.HandlerFunc) http.HandlerFunc {
 		// 	return
 		// }
 
-
-		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid{
+		if claims, ok := token.Claims.(jwt.MapClaims); ok{
+			fmt.Println(r.Method, "methodddd")
 			fmt.Println(claims, "claimsss are here")
 			params := mux.Vars(r)
 			requestUser := params["username"]
+
+			if r.Method == "POST" {
+				username := claims["iss"] 
+				// Str, _ := username.(string)
+				fmt.Println("username type is", reflect.TypeOf(username))
+				handler.ServeHTTP(w, r)
+				return
+			}
+
+
+
 			if claims["iss"] == requestUser  {
 				fmt.Printf("User is %s ", requestUser)
 				// r.Header.Set("iss", "nermin")
 				handler.ServeHTTP(w, r)
 				return
-			}else{
+			}else {
+				if r.Method == "PUT" {
 				fmt.Println("User is not same with updated user")
+				fmt.Printf("User is %s ", requestUser)
 				var err Error
-				err = SetError(err, "You can not update the client")
+				err = SetError(err, "Only Client himself can change his profile")
 				json.NewEncoder(w).Encode(err)
-				return
+				return}
+				if r.Method == "DELETE" {
+					var err Error
+					err = SetError(err, "Only Client himself can delete his profile")
+					json.NewEncoder(w).Encode(err)
+					return
+				}
 			}
 		}
 

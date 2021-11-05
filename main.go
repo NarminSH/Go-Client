@@ -4,6 +4,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"clientapi/middleware"
 	"clientapi/models"
@@ -12,6 +13,7 @@ import (
 
 	_ "clientapi/docs"
 
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux" // client/server functionality
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
@@ -57,9 +59,10 @@ func getCLients(w http.ResponseWriter, r *http.Request) {
 func getClient(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)
-	id := params["id"]
+	username := params["username"]
 	var client models.Client
-	db.First(&client, id)
+
+	db.First(&client, username)
 	json.NewEncoder(w).Encode(client)
 }
 
@@ -77,11 +80,37 @@ func createClient(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("worked create")
 	w.Header().Set("Content-Type", "application/json")
 	var newClient models.Client
-	json.NewDecoder(r.Body).Decode(&newClient)
-	// newClient.ID = strconv.Itoa(len(clients) + 1)
-	// clients = append(clients, newClient)
-	db.Create(&newClient)
-	json.NewEncoder(w).Encode((newClient))
+	if r.Header["Authorization"] == nil{
+		var err middleware.Error
+		err = middleware.SetError(err, "No Authorization credentials were provided")
+		json.NewEncoder(w).Encode(err)
+		return
+	}
+
+	stringToken := r.Header["Authorization"][0]
+	split := strings.Split(stringToken, " ")
+	responseToken := split[1]
+
+	var mySigningKey = []byte(middleware.Secretkey)
+
+	token, _ := jwt.Parse(responseToken, func(token *jwt.Token) (interface{}, error) {
+		fmt.Println(token, "Parsed token is over here")
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("There was an error in parsing token.")
+		}
+		return mySigningKey, nil
+	})
+
+	if claims, ok := token.Claims.(jwt.MapClaims); ok{
+			username := claims["iss"] 
+			StrUsername, _ := username.(string)
+			json.NewDecoder(r.Body).Decode(&newClient)
+			newClient.Username = StrUsername
+			// newClient.ID = strconv.Itoa(len(clients) + 1)
+			// clients = append(clients, newClient)
+			db.Create(&newClient)
+			json.NewEncoder(w).Encode((newClient))
+}
 }
 
 
@@ -101,6 +130,7 @@ func updateClient(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)
 	requestUser := params["username"]
+	fmt.Println(requestUser, "requested user is over hereeeee")
 	// id64, _ := strconv.ParseUint(requestId, 10, 64)
 	// idToUpdate := uint(id64)
 	var updatedclient models.Client
@@ -127,6 +157,7 @@ func deleteClient(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)
 	requestUser := params["username"]
+	fmt.Println(requestUser, "trying to delete user")
 	// id64, _ := strconv.ParseUint(requestId, 10, 64)
 	// idToDelete := uint(id64)
 	db.Where("username = ?", requestUser).Delete(&models.Client{})
@@ -223,10 +254,10 @@ func main() {
 
 	router := mux.NewRouter()
 	router.HandleFunc("/api/v1.0/clients", getCLients).Methods("GET")
-	router.HandleFunc("/api/v1.0/clients/{id}", getClient).Methods("GET")
+	router.HandleFunc("/api/v1.0/clients/{username}", getClient).Methods("GET")
 	router.HandleFunc("/api/v1.0/clients", createClient).Methods("POST")
 	router.HandleFunc("/api/v1.0/clients/{username}", middleware.IsAuthorized(updateClient)).Methods("PUT")
-	router.HandleFunc("/api/v1.0/clients/{id}", middleware.IsAuthorized(deleteClient)).Methods("DELETE")
+	router.HandleFunc("/api/v1.0/clients/{username}", middleware.IsAuthorized(deleteClient)).Methods("DELETE")
 	// router.HandleFunc("/api/v1.0/orders", getOrders).Methods("GET")
 	// router.HandleFunc("/api/v1.0/orders", createOrder).Methods("POST")
 	// router.HandleFunc("/api/v1.0/orders/{orderId}", getOrder).Methods("GET")
