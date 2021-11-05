@@ -217,8 +217,8 @@ func main() {
 
 	// Create the database. This is a one-time step.
 	// Comment out if running multiple times - You may see an error otherwise
-	// db.Exec("CREATE DATABASE client_db")
-	// db.Exec("USE client_db")
+	db.Exec("CREATE DATABASE client_db")
+	db.Exec("USE client_db")
 	db.AutoMigrate(&models.Client{})
 
 	router := mux.NewRouter()
