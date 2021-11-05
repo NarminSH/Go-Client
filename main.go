@@ -32,6 +32,22 @@ var err error
 var clients []models.Client
 
 
+var result struct {
+	Found bool
+  }
+
+
+  type Succesful struct {
+	IsSuccess bool   `json:"isSucces"`
+	Message string `json:"message"`
+}
+
+
+func SetSuccess(success Succesful, message string) Succesful {
+	success.IsSuccess = true
+	success.Message = message
+	return success
+}
 
 
 // GetClients godoc
@@ -94,7 +110,6 @@ func createClient(w http.ResponseWriter, r *http.Request) {
 	var mySigningKey = []byte(middleware.Secretkey)
 
 	token, _ := jwt.Parse(responseToken, func(token *jwt.Token) (interface{}, error) {
-		fmt.Println(token, "Parsed token is over here")
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("There was an error in parsing token.")
 		}
@@ -105,10 +120,27 @@ func createClient(w http.ResponseWriter, r *http.Request) {
 			username := claims["iss"] 
 			StrUsername, _ := username.(string)
 			json.NewDecoder(r.Body).Decode(&newClient)
+
 			newClient.Username = StrUsername
+			fmt.Println(StrUsername, "usernameee")
+			
 			// newClient.ID = strconv.Itoa(len(clients) + 1)
 			// clients = append(clients, newClient)
-			db.Create(&newClient)
+			err := db.Where("username = ? ", StrUsername).First(&newClient).Error
+			fmt.Println(err, "zeroooo")
+			if err != nil {
+				if err == gorm.ErrRecordNotFound {
+					fmt.Println(err, "firsttt")
+					db.Create(&newClient)
+				} 
+			} else {
+				fmt.Println(err, "seconddd")
+				var err middleware.Error
+				err = middleware.SetError(err, "User with this username exists")
+				json.NewEncoder(w).Encode(err)
+				return
+			}
+
 			json.NewEncoder(w).Encode((newClient))
 }
 }
@@ -162,6 +194,10 @@ func deleteClient(w http.ResponseWriter, r *http.Request) {
 	// idToDelete := uint(id64)
 	db.Where("username = ?", requestUser).Delete(&models.Client{})
 	w.WriteHeader(http.StatusOK)
+	var success Succesful
+	success = SetSuccess(success, "User is deleted!")
+	json.NewEncoder(w).Encode(success)
+	return
 }
 
 
@@ -237,7 +273,7 @@ func deleteClient(w http.ResponseWriter, r *http.Request) {
 // @host 192.168.31.74:8004
 // @BasePath /
 func main() {
-	db, err = gorm.Open("postgres", "host=192.168.31.74 user=lezzetly password=lezzetly123 dbname=db_name port=5432 sslmode=disable Timezone=Asia/Baku")
+	db, err = gorm.Open("postgres", "host=192.168.31.74  user=lezzetly password=lezzetly123 dbname=db_name port=5432 sslmode=disable Timezone=Asia/Baku")
 
 	if err != nil {
 		fmt.Println(err, "Error is  here")
