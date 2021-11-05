@@ -276,10 +276,10 @@ func deleteClient(w http.ResponseWriter, r *http.Request) {
 //@in header
 //@name Authorization
 
-// @host localhost:8000/api/v1.0
+// @host 192.168.31.74:8004/api/v1.0
 // @BasePath /
 func main() {
-	db, err = gorm.Open("postgres", "host=localhost  user=lezzetly password=lezzetly123 dbname=db_name port=5432 sslmode=disable Timezone=Asia/Baku")
+	db, err = gorm.Open("postgres", "host=192.168.31.74  user=lezzetly password=lezzetly123 dbname=db_name port=5432 sslmode=disable Timezone=Asia/Baku")
 
 	if err != nil {
 		fmt.Println(err, "Error is  here")
