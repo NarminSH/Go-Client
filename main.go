@@ -35,13 +35,13 @@ var clients []models.Client
 
 
   type Succesful struct {
-	IsSuccess bool   `json:"isSucces"`
+	// IsSuccess bool   `json:"isSucces"`
 	Message string `json:"message"`
 }
 
 
 func SetSuccess(success Succesful, message string) Succesful {
-	success.IsSuccess = true
+	// success.IsSuccess = true
 	success.Message = message
 	return success
 }
@@ -195,6 +195,7 @@ func deleteClient(w http.ResponseWriter, r *http.Request) {
 	// id64, _ := strconv.ParseUint(requestId, 10, 64)
 	// idToDelete := uint(id64)
 	db.Where("username = ?", requestUser).Delete(&models.Client{})
+	
 	w.WriteHeader(http.StatusOK)
 	var success Succesful
 	success = SetSuccess(success, "User is deleted!")
@@ -218,7 +219,7 @@ func deleteClient(w http.ResponseWriter, r *http.Request) {
 // func getOrders(w http.ResponseWriter, r *http.Request) {
 // 	w.Header().Set("Content-Type", "application/json")
 // 	var orders []models.Order
-// 	db.Preload("Items").Find(&orders)
+// 	db.Find(&orders)
 // 	json.NewEncoder(w).Encode(orders)
 // }
 
@@ -293,6 +294,7 @@ func main() {
 	// db.Exec("CREATE DATABASE client_db")
 	// db.Exec("USE client_db")
 	db.AutoMigrate(&models.Client{})
+	db.AutoMigrate(&models.Order{})
 
 	router := mux.NewRouter()
 	router.HandleFunc("/api/v1.0/clients", getCLients).Methods("GET")

@@ -17,4 +17,4 @@ type Client struct {
 	Email       string `json:"email" gorm:"type:varchar(50); not null"`
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
-}
+}	

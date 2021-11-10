@@ -27,14 +27,14 @@ var (
 
 
 type Error struct {
-	IsError bool   `json:"isError"`
-	Message string `json:"message"`
+	// IsError bool   `json:"isError"`
+	Warning string `json:"message"`
 }
 
 
 func SetError(err Error, message string) Error {
-	err.IsError = true
-	err.Message = message
+	// err.IsError = true
+	err.Warning = message
 	return err
 }
 
