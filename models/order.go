@@ -11,8 +11,8 @@ import (
 type Order struct {
 	// gorm.Model
 	ID                    int64          `json:"Id" gorm:"primary_key"`  
-	ClientId              int64            `json:"client_id" gorm:"index"`   
-	Client                Client         `json:"client" gorm:"foreignKey:ClientId"`
+	ClientUsername          string            `json:"clientUsername" gorm:"index; type:varchar(50)"`   
+	Client                Client         `json:"client" gorm:"foreignKey:ClientUsername"`
 	CookId                int64          `json:"cook_id" gorm:"index"`
 	CourierId             int64         `json:"courier" gorm:"foreignKey:OrderId"`
 	DeliveryInformationId  int64        `json:"delivery_information_id" gorm:"foreignKey:"`

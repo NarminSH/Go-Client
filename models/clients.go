@@ -13,6 +13,7 @@ type Client struct {
 	LastName    string `json:"lastname" gorm:"type:varchar(50); not null"`
 	Patronymic  string `json:"patronymic" gorm:"type:varchar(70)"`
 	Username    string `json:"username" gorm:"unique;not null;type:varchar(50)"`
+	UserType    string  `json:"usertype" gorm:"type:varchar(4)"`
 	PhoneNumber string `json:"phone_number" gorm:"type:varchar(20)"`
 	Email       string `json:"email" gorm:"type:varchar(50); not null"`
 	CreatedAt   time.Time

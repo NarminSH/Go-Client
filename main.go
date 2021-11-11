@@ -281,7 +281,7 @@ func deleteClient(w http.ResponseWriter, r *http.Request) {
 // @host 192.168.31.74:8004
 // @BasePath /api/v1.0
 func main() {
-	db, err = gorm.Open("postgres", "host=192.168.31.74  user=lezzetly password=lezzetly123 dbname=db_name port=5432 sslmode=disable Timezone=Asia/Baku")
+	db, err = gorm.Open("postgres", "host=localhost  user=lezzetly password=lezzetly123 dbname=db_name port=5432 sslmode=disable Timezone=Asia/Baku")
 
 	if err != nil {
 		fmt.Println(err, "Error is  here")
@@ -296,7 +296,7 @@ func main() {
 	// db.Exec("USE client_db")
 	db.AutoMigrate(&models.Client{})
 	db.AutoMigrate(&models.Order{})
-	db.Model(&models.Order{}).AddForeignKey("client_id", "clients(id)", "SET NULL", "SET NULL")
+	db.Model(&models.Order{}).AddForeignKey("client_username", "clients(username)", "SET NULL", "SET NULL")
 
 	router := mux.NewRouter()
 	router.HandleFunc("/api/v1.0/clients", getCLients).Methods("GET")
