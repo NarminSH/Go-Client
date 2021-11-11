@@ -116,7 +116,8 @@ func createClient(w http.ResponseWriter, r *http.Request) {
 	})
 
 	if claims, ok := token.Claims.(jwt.MapClaims); ok{
-			username := claims["iss"] 
+			fmt.Println(claims, "claims are herererererer")
+			username := claims["Username"] 
 			StrUsername, _ := username.(string)
 			json.NewDecoder(r.Body).Decode(&newClient)
 

@@ -28,7 +28,7 @@ var (
 
 type Error struct {
 	// IsError bool   `json:"isError"`
-	Warning string `json:"message"`
+	Warning string `json:"warning"`
 }
 
 
@@ -75,9 +75,9 @@ func IsAuthorized(handler http.HandlerFunc) http.HandlerFunc {
 			fmt.Println(claims, "claimsss are here")
 			params := mux.Vars(r)
 			requestUser := params["username"]
-
+			
 			if r.Method == "POST" {
-				username := claims["iss"] 
+				username := claims["Username"] 
 				// Str, _ := username.(string)
 				fmt.Println("username type is", reflect.TypeOf(username))
 				handler.ServeHTTP(w, r)
@@ -86,9 +86,9 @@ func IsAuthorized(handler http.HandlerFunc) http.HandlerFunc {
 
 
 
-			if claims["iss"] == requestUser  {
+			if claims["Username"] == requestUser  {
 				fmt.Printf("User is %s ", requestUser)
-				// r.Header.Set("iss", "nermin")
+				// r.Header.Set("Username", "nermin")
 				handler.ServeHTTP(w, r)
 				return
 			}else {
