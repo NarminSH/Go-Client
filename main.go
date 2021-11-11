@@ -206,23 +206,23 @@ func deleteClient(w http.ResponseWriter, r *http.Request) {
 
 
 
-// // Orders
-// func createOrder(w http.ResponseWriter, r *http.Request) {
-// 	var neworder models.Order
-// 	json.NewDecoder(r.Body).Decode(&neworder)
-// 	// Creates new order by inserting records in the `orders` and `items` table
-// 	db.Create(&neworder)
-// 	w.Header().Set("Content-Type", "application/json")
-// 	json.NewEncoder(w).Encode(neworder)
-// }
+// Orders
+func createOrder(w http.ResponseWriter, r *http.Request) {
+	var neworder models.Order
+	json.NewDecoder(r.Body).Decode(&neworder)
+	// Creates new order by inserting records in the `orders` and `items` table
+	db.Create(&neworder)
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(neworder)
+}
 
 
-// func getOrders(w http.ResponseWriter, r *http.Request) {
-// 	w.Header().Set("Content-Type", "application/json")
-// 	var orders []models.Order
-// 	db.Find(&orders)
-// 	json.NewEncoder(w).Encode(orders)
-// }
+func getOrders(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	var orders []models.Order
+	db.Preload("Items").Find(&orders)
+	json.NewEncoder(w).Encode(orders)
+}
 
 
 
@@ -296,6 +296,7 @@ func main() {
 	// db.Exec("USE client_db")
 	db.AutoMigrate(&models.Client{})
 	db.AutoMigrate(&models.Order{})
+	db.AutoMigrate(&models.Item{})
 	db.Model(&models.Order{}).AddForeignKey("client_username", "clients(username)", "SET NULL", "SET NULL")
 
 	router := mux.NewRouter()
@@ -304,8 +305,8 @@ func main() {
 	router.HandleFunc("/api/v1.0/clients", createClient).Methods("POST")
 	router.HandleFunc("/api/v1.0/clients/{username}", middleware.IsAuthorized(updateClient)).Methods("PUT")
 	router.HandleFunc("/api/v1.0/clients/{username}", middleware.IsAuthorized(deleteClient)).Methods("DELETE")
-	// router.HandleFunc("/api/v1.0/orders", getOrders).Methods("GET")
-	// router.HandleFunc("/api/v1.0/orders", createOrder).Methods("POST")
+	router.HandleFunc("/api/v1.0/orders", getOrders).Methods("GET")
+	router.HandleFunc("/api/v1.0/orders", createOrder).Methods("POST")
 	// router.HandleFunc("/api/v1.0/orders/{orderId}", getOrder).Methods("GET")
 	// router.HandleFunc("/api/v1.0/orderitems", createItem).Methods("POST")
 
