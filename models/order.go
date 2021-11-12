@@ -15,11 +15,11 @@ type Order struct {
 	// Client                Client         
 	CookId                int64          `json:"cook_id" gorm:"index"`
 	CourierId             int64         `json:"courier" gorm:"foreignKey:OrderId"`
-	DeliveryInformationId  int64        `json:"delivery_information_id" gorm:"foreignKey:"`
+	DeliveryInformationId  int64        `json:"delivery_information_id" gorm:"foreignKey:OrderId"`
 	Complete             bool           `json:"complete"`
 	IsRejected           bool           `json:"is_rejected"`
 	RejectReason         string         `json:"reject_reason" gorm:"type:varchar(250)"`
-	Items        []Item    `json:"items" gorm:"foreignkey:ID"`
+	Items               []Item    `json:"items" gorm:"foreignkey:ID"`
 	CreatedAt          time.Time        `gorm:"not null"`    
 	UpdatedAt          time.Time         `gorm:"not null"` 
 }
