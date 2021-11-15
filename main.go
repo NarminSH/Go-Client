@@ -318,7 +318,7 @@ func main() {
 	db.AutoMigrate(&models.Client{})
 	// db.AutoMigrate(&models.Order{})
 	// db.AutoMigrate(&models.Item{})
-	db.Model(&models.Order{}).AddForeignKey("client_id", "clients(id)", "NO ACTION", "NO ACTION")
+	// db.Model(&models.Order{}).AddForeignKey("client_id", "clients(id)", "NO ACTION", "NO ACTION")
 
 	router := mux.NewRouter()
 	router.HandleFunc("/api/v1.0/clients", getCLients).Methods("GET")
