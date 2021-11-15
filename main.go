@@ -219,7 +219,7 @@ func clientOrders(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(client.ID, "client id is over here")
 	client_id := client.ID
 	var orders []models.Order
-	db.Where("client_id = ? ", client_id).Find(&orders)
+	db.Where("client_id = ? ", client_id).Preload("Items").Find(&orders)
 	json.NewEncoder(w).Encode(orders)
 }
 
