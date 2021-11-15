@@ -16,6 +16,7 @@ type Client struct {
 	UserType    string  `json:"usertype" gorm:"type:varchar(4)"`
 	PhoneNumber string `json:"phone_number" gorm:"type:varchar(20)"`
 	Email       string `json:"email" gorm:"type:varchar(50); not null"`
+	Location    string  `json:"location" gorm:"type:varchar(250)"`
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 }	

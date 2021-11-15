@@ -9,7 +9,7 @@ import (
 type Order struct {
 	// gorm.Model
 	ID             int64  `json:"Id" gorm:"primary_key"`
-	ClientID       int64   `json:"client_id"`
+	ClientID       int   `json:"client_id"`
 	// Client        ClientID
 	CookId                int64     `json:"cook_id"`
 	CourierId             int64     `json:"courier_id"`
@@ -18,8 +18,8 @@ type Order struct {
 	IsRejected            bool      `json:"is_rejected"`
 	RejectReason          string    `json:"reject_reason" gorm:"type:varchar(250)"`
 	Items                 []Item    `json:"items" gorm:"foreignkey:ID"`
-	CreatedAt             time.Time `gorm:"not null"`
-	UpdatedAt             time.Time `gorm:"not null"`
+	CreatedAt             time.Time `json:"created_at" gorm:"not null"`
+	UpdatedAt             time.Time `json:"updated_at" gorm:"not null"`
 }
 
 
@@ -30,10 +30,10 @@ func (Order) TableName() string {
 
 type Item struct {
 	// gorm.Model
-	ID       int64 `json:"Id" gorm:"primary_key"`
-	MealId   int64 `json:"meal_id"`
-	Quantity int16 `json:"quantity"`
-	OrderID  int64  `json:"-"`
+	ID         int64      `json:"Id" gorm:"primary_key"`
+	MealId     int64      `json:"meal_id" gorm:"not null"`
+	Quantity   int16      `json:"quantity" gorm:"not null"`
+	OrderID    int64      `json:"-" gorm:"not null"`
 }
 
 

@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"reflect"
 	"strings"
 
 	"github.com/dgrijalva/jwt-go"
@@ -76,13 +75,13 @@ func IsAuthorized(handler http.HandlerFunc) http.HandlerFunc {
 			params := mux.Vars(r)
 			requestUser := params["username"]
 			
-			if r.Method == "POST" {
-				username := claims["Username"] 
-				// Str, _ := username.(string)
-				fmt.Println("username type is", reflect.TypeOf(username))
-				handler.ServeHTTP(w, r)
-				return
-			}
+			// if r.Method == "POST" {
+			// 	username := claims["Username"] 
+			// 	// Str, _ := username.(string)
+			// 	fmt.Println("username type is", reflect.TypeOf(username))
+			// 	handler.ServeHTTP(w, r)
+			// 	return
+			// }
 
 
 

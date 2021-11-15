@@ -75,7 +75,8 @@ func getClient(w http.ResponseWriter, r *http.Request) {
 	username := params["username"]
 	var client models.Client
 
-	db.First(&client, username)
+	user := db.Where("username = ?", username).First(&client)
+	fmt.Println(user, "user over herereee", client.ID)
 	json.NewEncoder(w).Encode(client)
 }
 
@@ -207,16 +208,20 @@ func deleteClient(w http.ResponseWriter, r *http.Request) {
 
 
 
-//get all orders of particular 
-// func clientOrders(w http.ResponseWriter, r *http.Request) {
-// 	w.Header().Set("Content-Type", "application/json")
-// 	params := mux.Vars(r)
-// 	username := params["username"]
-// 	var client models.Client
-
-// 	db.First(&client, username)
-// 	json.NewEncoder(w).Encode(client)
-// }
+//get all orders of particular user 
+func clientOrders(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	params := mux.Vars(r)
+	username := params["username"]
+	var client models.Client
+	user := db.Where("username = ?", username).First(&client)
+	fmt.Println(user, "user over herereee")
+	fmt.Println(client.ID, "client id is over here")
+	client_id := client.ID
+	var orders []models.Order
+	db.Where("client_id = ? ", client_id).Find(&orders)
+	json.NewEncoder(w).Encode(orders)
+}
 
 
 
@@ -304,7 +309,7 @@ func main() {
 	router.HandleFunc("/api/v1.0/clients", createClient).Methods("POST")
 	router.HandleFunc("/api/v1.0/clients/{username}", middleware.IsAuthorized(updateClient)).Methods("PUT")
 	router.HandleFunc("/api/v1.0/clients/{username}", middleware.IsAuthorized(deleteClient)).Methods("DELETE")
-	// router.HandleFunc("/api/v1.0/clients/{username}/orders", clientOrders).Methods("GET")
+	router.HandleFunc("/api/v1.0/clients/{username}/orders", clientOrders).Methods("GET")
 
 	// router.HandleFunc("/api/v1.0/orders", getOrders).Methods("GET")
 	// router.HandleFunc("/api/v1.0/orders", createOrder).Methods("POST")
