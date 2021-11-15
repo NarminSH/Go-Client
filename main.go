@@ -225,6 +225,23 @@ func clientOrders(w http.ResponseWriter, r *http.Request) {
 
 
 
+//get all ongoing orders of particular user 
+func clientActiveOrders(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	params := mux.Vars(r)
+	username := params["username"]
+	var client models.Client
+	user := db.Where("username = ?", username).First(&client)
+	fmt.Println(user, "user over herereee")
+	fmt.Println(client.ID, "client id is over here")
+	client_id := client.ID
+	var orders []models.Order
+	active := db.Where("client_id = ? AND complete = ? ", client_id, "False").Preload("Items").Find(&orders)
+	fmt.Println(active, "active orderssss")
+	json.NewEncoder(w).Encode(orders)
+}
+
+
 
 // Orders
 // func createOrder(w http.ResponseWriter, r *http.Request) {
@@ -310,6 +327,7 @@ func main() {
 	router.HandleFunc("/api/v1.0/clients/{username}", middleware.IsAuthorized(updateClient)).Methods("PUT")
 	router.HandleFunc("/api/v1.0/clients/{username}", middleware.IsAuthorized(deleteClient)).Methods("DELETE")
 	router.HandleFunc("/api/v1.0/clients/{username}/orders", clientOrders).Methods("GET")
+	router.HandleFunc("/api/v1.0/clients/{username}/active-orders", clientActiveOrders).Methods("GET")
 
 	// router.HandleFunc("/api/v1.0/orders", getOrders).Methods("GET")
 	// router.HandleFunc("/api/v1.0/orders", createOrder).Methods("POST")
