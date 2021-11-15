@@ -206,6 +206,21 @@ func deleteClient(w http.ResponseWriter, r *http.Request) {
 
 
 
+
+//get all orders of particular 
+// func clientOrders(w http.ResponseWriter, r *http.Request) {
+// 	w.Header().Set("Content-Type", "application/json")
+// 	params := mux.Vars(r)
+// 	username := params["username"]
+// 	var client models.Client
+
+// 	db.First(&client, username)
+// 	json.NewEncoder(w).Encode(client)
+// }
+
+
+
+
 // Orders
 // func createOrder(w http.ResponseWriter, r *http.Request) {
 // 	var neworder models.Order
@@ -249,15 +264,6 @@ func deleteClient(w http.ResponseWriter, r *http.Request) {
 
 
 
-
-
-
-
-
-
-
-
-
 // host=client_postgres_1 - local - server
 // host=localhost - local development
 // host=192.168.31.74 - production
@@ -274,7 +280,7 @@ func deleteClient(w http.ResponseWriter, r *http.Request) {
 // @host 192.168.31.74:8004
 // @BasePath /api/v1.0
 func main() {
-	db, err = gorm.Open("postgres", "host=192.168.31.74  user=lezzetly password=lezzetly123 dbname=db_name port=5432 sslmode=disable Timezone=Asia/Baku")
+	db, err = gorm.Open("postgres", "host=localhost  user=lezzetly password=lezzetly123 dbname=db_name port=5432 sslmode=disable Timezone=Asia/Baku")
 
 	if err != nil {
 		fmt.Println(err, "Error is  here")
@@ -288,9 +294,9 @@ func main() {
 	// db.Exec("CREATE DATABASE client_db")
 	// db.Exec("USE client_db")
 	db.AutoMigrate(&models.Client{})
-	// db.AutoMigrate(&models.Order{})
-	// db.AutoMigrate(&models.Item{})
-	// db.Model(&models.Order{}).AddForeignKey("client_username", "clients(username)", "SET NULL", "SET NULL")
+	db.AutoMigrate(&models.Order{})
+	db.AutoMigrate(&models.Item{})
+	db.Model(&models.Order{}).AddForeignKey("client_id", "clients(id)", "NO ACTION", "NO ACTION")
 
 	router := mux.NewRouter()
 	router.HandleFunc("/api/v1.0/clients", getCLients).Methods("GET")
@@ -298,6 +304,8 @@ func main() {
 	router.HandleFunc("/api/v1.0/clients", createClient).Methods("POST")
 	router.HandleFunc("/api/v1.0/clients/{username}", middleware.IsAuthorized(updateClient)).Methods("PUT")
 	router.HandleFunc("/api/v1.0/clients/{username}", middleware.IsAuthorized(deleteClient)).Methods("DELETE")
+	// router.HandleFunc("/api/v1.0/clients/{username}/orders", clientOrders).Methods("GET")
+
 	// router.HandleFunc("/api/v1.0/orders", getOrders).Methods("GET")
 	// router.HandleFunc("/api/v1.0/orders", createOrder).Methods("POST")
 	// router.HandleFunc("/api/v1.0/orders/{orderId}", getOrder).Methods("GET")

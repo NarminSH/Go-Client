@@ -19,3 +19,25 @@ type Client struct {
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 }	
+
+
+// type Cook struct {
+// 	ID             uint   `json:"id" gorm:"primary_key"` 
+// 	patronymic	  string `json:"firstname" gorm:"type:varchar(50); not null"`	
+// 	username      string `json:"username" gorm:"unique;type:varchar(50); not null"`
+// 	first_name	  string `json:"firstname" gorm:"type:varchar(50); not null"`	
+// 	last_name	  string    `json:"lastname" gorm:"type:varchar(50); not null"`
+// 	email	      string `json:"email" gorm:"type:varchar(50); not null"`
+// 	phone     	    string `json:"phone" gorm:"type:varchar(20)"`	
+// 	user_type       string  `json:"usertype" gorm:"type:varchar(4)"`
+// 	birth_place	    string  `json:"birth_place" gorm:"type:varchar(50)"`
+// 	city	        string  `json:"city" gorm:"type:varchar(50)"`
+// 	service_place	string  `json:"service_place" gorm:"type:varchar(100)"`
+// 	payment_address	
+// 	work_experience		
+// 	rating	
+// 	is_available	
+// 	created_at	timestamptz	
+// 	updated_at	timestamptz	
+
+// }
