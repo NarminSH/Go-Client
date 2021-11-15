@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"strings"
 
-	"clientapi/middleware"
+	middleware "clientapi/middleware"
 	"clientapi/models"
 	"log" //error handling
 	"net/http"
@@ -214,14 +214,47 @@ func clientOrders(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	username := params["username"]
 	var client models.Client
-	user := db.Where("username = ?", username).First(&client)
-	fmt.Println(user, "user over herereee")
-	fmt.Println(client.ID, "client id is over here")
-	client_id := client.ID
-	var orders []models.Order
-	db.Where("client_id = ? ", client_id).Preload("Items").Find(&orders)
-	json.NewEncoder(w).Encode(orders)
+	if r.Header["Authorization"] == nil{
+		var err middleware.Error
+		err = middleware.SetError(err, "No Authorization credentials were provided")
+		json.NewEncoder(w).Encode(err)
+		return
+	}
+
+	stringToken := r.Header["Authorization"][0]
+	split := strings.Split(stringToken, " ")
+	responseToken := split[1]
+
+	var mySigningKey = []byte(middleware.Secretkey)
+
+	token, _ := jwt.Parse(responseToken, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("There was an error in parsing token.")
+		}
+		return mySigningKey, nil
+	})
+
+	if claims, ok := token.Claims.(jwt.MapClaims); ok{
+		if claims["Username"] == username{
+			user := db.Where("username = ?", username).First(&client)
+		fmt.Println(user, "user over herereee")
+		fmt.Println(client.ID, "client id is over here")
+		client_id := client.ID
+		var orders []models.Order
+		db.Where("client_id = ? ", client_id).Preload("Items").Find(&orders)
+		json.NewEncoder(w).Encode(orders)
+		} else{
+			fmt.Println(claims["Username"])
+		var err middleware.Error
+		err = middleware.SetError(err, "You do not own permission to perform this action")
+		json.NewEncoder(w).Encode(err)
+		return
+		}
+	}
+
 }
+	
+
 
 
 
@@ -302,7 +335,7 @@ func clientActiveOrders(w http.ResponseWriter, r *http.Request) {
 // @host 192.168.31.74:8004
 // @BasePath /api/v1.0
 func main() {
-	db, err = gorm.Open("postgres", "host=192.168.31.74  user=lezzetly password=lezzetly123 dbname=db_name port=5432 sslmode=disable Timezone=Asia/Baku")
+	db, err = gorm.Open("postgres", "host=localhost  user=lezzetly password=lezzetly123 dbname=db_name port=5432 sslmode=disable Timezone=Asia/Baku")
 
 	if err != nil {
 		fmt.Println(err, "Error is  here")
@@ -316,9 +349,9 @@ func main() {
 	// db.Exec("CREATE DATABASE client_db")
 	// db.Exec("USE client_db")
 	db.AutoMigrate(&models.Client{})
-	// db.AutoMigrate(&models.Order{})
-	// db.AutoMigrate(&models.Item{})
-	// db.Model(&models.Order{}).AddForeignKey("client_id", "clients(id)", "NO ACTION", "NO ACTION")
+	db.AutoMigrate(&models.Order{})
+	db.AutoMigrate(&models.Item{})
+	db.Model(&models.Order{}).AddForeignKey("client_id", "clients(id)", "NO ACTION", "NO ACTION")
 
 	router := mux.NewRouter()
 	router.HandleFunc("/api/v1.0/clients", getCLients).Methods("GET")
