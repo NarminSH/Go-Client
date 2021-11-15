@@ -316,8 +316,8 @@ func main() {
 	// db.Exec("CREATE DATABASE client_db")
 	// db.Exec("USE client_db")
 	db.AutoMigrate(&models.Client{})
-	db.AutoMigrate(&models.Order{})
-	db.AutoMigrate(&models.Item{})
+	// db.AutoMigrate(&models.Order{})
+	// db.AutoMigrate(&models.Item{})
 	db.Model(&models.Order{}).AddForeignKey("client_id", "clients(id)", "NO ACTION", "NO ACTION")
 
 	router := mux.NewRouter()
