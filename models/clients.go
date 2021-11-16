@@ -49,9 +49,12 @@ type Cook struct {
 	ServicePlace	string  `json:"service_place" gorm:"type:varchar(100)"`
 	PaymentAddress	string   `json:"payment_address" gorm:"type:varchar(255)"`
 }
+
+
 func (Cook) TableName() string {
 	return "cooks_cook"
 }
+
 
 type Courier struct {
 	Base
