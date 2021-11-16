@@ -12,7 +12,9 @@ type Order struct {
 	ClientID       int   `json:"client_id"`
 	// Client        ClientID
 	CookId                int64     `json:"cook_id"`
+	Cook      Cook
 	CourierId             int64     `json:"courier_id"`
+	Courier       Courier
 	DeliveryInformationId int64     `json:"delivery_information_id"`
 	Complete              bool      `json:"complete" gorm:"not null"`
 	IsRejected            bool      `json:"is_rejected"`

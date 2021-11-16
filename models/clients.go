@@ -1,8 +1,9 @@
 package models
 
-
 import (
 	"time"
+
+	"github.com/shopspring/decimal"
 )
 
 
@@ -22,23 +23,43 @@ type Client struct {
 }	
 
 
-// type Cook struct {
-// 	ID             uint   `json:"id" gorm:"primary_key"` 
-// 	patronymic	  string `json:"firstname" gorm:"type:varchar(50); not null"`	
-// 	username      string `json:"username" gorm:"unique;type:varchar(50); not null"`
-// 	first_name	  string `json:"firstname" gorm:"type:varchar(50); not null"`	
-// 	last_name	  string    `json:"lastname" gorm:"type:varchar(50); not null"`
-// 	email	      string `json:"email" gorm:"type:varchar(50); not null"`
-// 	phone     	    string `json:"phone" gorm:"type:varchar(20)"`	
-// 	user_type       string  `json:"usertype" gorm:"type:varchar(4)"`
-// 	birth_place	    string  `json:"birth_place" gorm:"type:varchar(50)"`
-// 	city	        string  `json:"city" gorm:"type:varchar(50)"`
-// 	service_place	string  `json:"service_place" gorm:"type:varchar(100)"`
-// 	payment_address	
-// 	work_experience		
-// 	rating	
-// 	is_available	
-// 	created_at	timestamptz	
-// 	updated_at	timestamptz	
 
-// }
+type Base struct{
+	ID             uint   `json:"id" gorm:"primary_key"` 
+	Patronymic	  string   `json:"patronymic" gorm:"type:varchar(60)"`	
+	Username      string   `json:"username" gorm:"unique;type:varchar(200)"`
+	FirstName	  string   `json:"firstname" gorm:"type:varchar(150)"`	
+	LastName	  string    `json:"lastname" gorm:"type:varchar(150)"`
+	Email	      string `json:"email" gorm:"type:varchar(254)"`
+	UserType       string  `json:"usertype" gorm:"type:varchar(5)"`
+	WorkExperience  int         `json:"work_experience"`
+	IsAvailable	 bool    `json:"is_available"`
+	Rating	         decimal.Decimal  `json:"rating" gorm:"type:decimal(2,1);"`
+	CreatedAt	time.Time	  `json:"created_at" gorm:"not null"`
+	UpdatedAt	time.Time	  `json:"updated_at" gorm:"not null"`
+}
+
+
+
+type Cook struct {
+	Base
+	Phone     	    string `json:"phone" gorm:"type:varchar(20)"`	
+	BirthPlace	    string  `json:"birth_place" gorm:"type:varchar(50)"`
+	City	        string  `json:"city" gorm:"type:varchar(50)"`
+	ServicePlace	string  `json:"service_place" gorm:"type:varchar(100)"`
+	PaymentAddress	string   `json:"payment_address" gorm:"type:varchar(255)"`
+}
+func (Cook) TableName() string {
+	return "cooks_cook"
+}
+
+type Courier struct {
+	Base
+	Phone     	    string `json:"phone" gorm:"type:varchar(12); not null"`	
+	Transport	    string  `json:"transport" gorm:"type:varchar(150)"`
+	Location    string  `json:"location" gorm:"type:varchar(255)"`
+}
+
+func (Courier) TableName() string {
+	return "delivery_courier"
+}
