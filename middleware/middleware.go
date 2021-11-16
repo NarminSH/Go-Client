@@ -23,7 +23,9 @@ type tokenClaims struct {
 var (
 	router *mux.Router
 	Secretkey string = "secretkeyjwt"
-  )
+)
+
+var Claimed_user string
 
 
 type Error struct {
@@ -83,8 +85,8 @@ func IsAuthorized(handler http.HandlerFunc) http.HandlerFunc {
 			// 	handler.ServeHTTP(w, r)
 			// 	return
 			// }
-			claimed_user := claims["Username"]
-			fmt.Println(claimed_user, "claimed user ")
+			Claimed_user := claims["Username"]
+			fmt.Println(Claimed_user, "claimed user ")
 
 
 			if claims["Username"] == requestUser  {
@@ -103,6 +105,12 @@ func IsAuthorized(handler http.HandlerFunc) http.HandlerFunc {
 				if r.Method == "DELETE" {
 					var err Error
 					err = SetError(err, "Only Client himself can delete his profile")
+					json.NewEncoder(w).Encode(err)
+					return
+				}
+				if r.Method == "GET" {
+					var err Error
+					err = SetError(err, "You do not own permissions to look at others' profile")
 					json.NewEncoder(w).Encode(err)
 					return
 				}

@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"strings"
 
-	middleware "clientapi/middleware"
+	"clientapi/middleware"
 	"clientapi/models"
 	"log" //error handling
 	"net/http"
@@ -32,19 +32,16 @@ var err error
 var clients []models.Client
 
 
-
-
   type Succesful struct {
-	// IsSuccess bool   `json:"isSucces"`
 	Message string `json:"message"`
 }
 
 
 func SetSuccess(success Succesful, message string) Succesful {
-	// success.IsSuccess = true
 	success.Message = message
 	return success
 }
+
 
 
 // GetClients godoc
@@ -214,44 +211,13 @@ func clientOrders(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	username := params["username"]
 	var client models.Client
-	if r.Header["Authorization"] == nil{
-		var err middleware.Error
-		err = middleware.SetError(err, "No Authorization credentials were provided")
-		json.NewEncoder(w).Encode(err)
-		return
-	}
-
-	stringToken := r.Header["Authorization"][0]
-	split := strings.Split(stringToken, " ")
-	responseToken := split[1]
-
-	var mySigningKey = []byte(middleware.Secretkey)
-
-	token, _ := jwt.Parse(responseToken, func(token *jwt.Token) (interface{}, error) {
-		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("There was an error in parsing token.")
-		}
-		return mySigningKey, nil
-	})
-
-	if claims, ok := token.Claims.(jwt.MapClaims); ok{
-		if claims["Username"] == username{
-			user := db.Where("username = ?", username).First(&client)
+	user := db.Where("username = ?", username).First(&client)
 		fmt.Println(user, "user over herereee")
 		fmt.Println(client.ID, "client id is over here")
 		client_id := client.ID
 		var orders []models.Order
 		db.Where("client_id = ? ", client_id).Preload("Items").Find(&orders)
 		json.NewEncoder(w).Encode(orders)
-		} else{
-			fmt.Println(claims["Username"])
-		var err middleware.Error
-		err = middleware.SetError(err, "You do not own permission to perform this action")
-		json.NewEncoder(w).Encode(err)
-		return
-		}
-	}
-
 }
 	
 
@@ -269,8 +235,7 @@ func clientActiveOrders(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(client.ID, "client id is over here")
 	client_id := client.ID
 	var orders []models.Order
-	active := db.Where("client_id = ? AND complete = ? ", client_id, "False").Preload("Items").Find(&orders)
-	fmt.Println(active, "active orderssss")
+	db.Where("client_id = ? AND complete = ? ", client_id, "False").Preload("Items").Find(&orders)
 	json.NewEncoder(w).Encode(orders)
 }
 
@@ -335,7 +300,7 @@ func clientActiveOrders(w http.ResponseWriter, r *http.Request) {
 // @host 192.168.31.74:8004
 // @BasePath /api/v1.0
 func main() {
-	db, err = gorm.Open("postgres", "host=192.168.31.74  user=lezzetly password=lezzetly123 dbname=db_name port=5432 sslmode=disable Timezone=Asia/Baku")
+	db, err = gorm.Open("postgres", "host=192.168.31.74   user=lezzetly password=lezzetly123 dbname=db_name port=5432 sslmode=disable Timezone=Asia/Baku")
 
 	if err != nil {
 		fmt.Println(err, "Error is  here")
@@ -359,8 +324,8 @@ func main() {
 	router.HandleFunc("/api/v1.0/clients", createClient).Methods("POST")
 	router.HandleFunc("/api/v1.0/clients/{username}", middleware.IsAuthorized(updateClient)).Methods("PUT")
 	router.HandleFunc("/api/v1.0/clients/{username}", middleware.IsAuthorized(deleteClient)).Methods("DELETE")
-	router.HandleFunc("/api/v1.0/clients/{username}/orders", clientOrders).Methods("GET")
-	router.HandleFunc("/api/v1.0/clients/{username}/active-orders", clientActiveOrders).Methods("GET")
+	router.HandleFunc("/api/v1.0/clients/{username}/orders", middleware.IsAuthorized(clientOrders)).Methods("GET")
+	router.HandleFunc("/api/v1.0/clients/{username}/active-orders", middleware.IsAuthorized(clientActiveOrders)).Methods("GET")
 
 	// router.HandleFunc("/api/v1.0/orders", getOrders).Methods("GET")
 	// router.HandleFunc("/api/v1.0/orders", createOrder).Methods("POST")
