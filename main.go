@@ -115,6 +115,7 @@ func IsAuthorized(handler http.HandlerFunc) http.HandlerFunc {
 			// fmt.Println(s, "rrrrrrr")
 			// fmt.Println(s, "query resultttttt")
 			client_id := client.ID
+			fmt.Println(client_id, "fffffffffffffff")
 			var tokenUser string
 			tokenUser = strconv.FormatUint(uint64(client_id), 10)
 			fmt.Println(tokenUser, "ccccccccc")
@@ -326,9 +327,9 @@ func deleteClient(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	requestUser := params["id"]
 	fmt.Println(requestUser, "trying to delete user")
-	// id64, _ := strconv.ParseUint(requestId, 10, 64)
-	// idToDelete := uint(id64)
-	db.Where("id = ?", requestUser).Delete(&models.Client{})
+	id64, _ := strconv.ParseUint(requestUser, 10, 64)
+	idToDelete := uint(id64)
+	db.Where("id = ?", idToDelete).Delete(&models.Client{})
 	
 	w.WriteHeader(http.StatusOK)
 	var success Succesful
