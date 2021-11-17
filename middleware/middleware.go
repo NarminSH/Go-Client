@@ -1,14 +1,21 @@
 package middleware
 
 import (
+	"clientapi/models"
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 	"strings"
+
+	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/postgres"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
 )
+
+var db *gorm.DB
 
 
 
@@ -22,7 +29,7 @@ type tokenClaims struct {
 
 var (
 	router *mux.Router
-	Secretkey string = "secretkeyjwt"
+	Secretkey string = "supersecretkey"
 )
 
 var Claimed_user string
@@ -76,7 +83,8 @@ func IsAuthorized(handler http.HandlerFunc) http.HandlerFunc {
 			fmt.Println(r.Method, "methodddd")
 			fmt.Println(claims, "claimsss are here")
 			params := mux.Vars(r)
-			requestUser := params["username"]
+			requestUser := params["id"]
+			fmt.Println(requestUser, "hhhhhhhhh")
 			
 			// if r.Method == "POST" {
 			// 	username := claims["Username"] 
@@ -85,11 +93,33 @@ func IsAuthorized(handler http.HandlerFunc) http.HandlerFunc {
 			// 	handler.ServeHTTP(w, r)
 			// 	return
 			// }
+			var client1 models.Client
 			Claimed_user := claims["Username"]
+			fmt.Println(Claimed_user, "qqqqqqqqq")
+			StrUsername, _ := Claimed_user.(string)
+			
+			fmt.Println(StrUsername, "ssssssssss")
+			fmt.Println(db, "dddddddd")
+			// q := main.Where("username = ? ", StrUsername).First(&client1)
+			// fmt.Println(q)
+			// if err != nil {
+			// 	if err == gorm.ErrRecordNotFound {
+			// 		fmt.Println(err, "firsttt")
+			// 	} 
+			// } else{
+			// 	fmt.Println("another error is here")
+			// }
+			// fmt.Println(s, "rrrrrrr")
+			// fmt.Println(s, "query resultttttt")
+			client_id := client1.ID
+			var token_user string
+			token_user = strconv.FormatUint(uint64(client_id), 10)
 			fmt.Println(Claimed_user, "claimed user ")
+			fmt.Println(token_user, "ccccccccc")
 
 
-			if claims["Username"] == requestUser  {
+			if token_user == requestUser  {
+				fmt.Println(token_user, "token user id iss ")
 				fmt.Printf("User is %s ", requestUser)
 				// r.Header.Set("Username", "nermin")
 				handler.ServeHTTP(w, r)
@@ -122,3 +152,6 @@ func IsAuthorized(handler http.HandlerFunc) http.HandlerFunc {
 		json.NewEncoder(w).Encode(err)
 	}
 }
+
+
+
