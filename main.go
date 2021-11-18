@@ -381,7 +381,8 @@ func clientActiveOrders(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(client.ID, "client id is over here")
 	client_id := client.ID
 	var orders []models.Order
-	db.Preload("Items").Find(&orders, "client_id = ? AND complete = ? ", client_id, "NULL")
+	db.Preload("Items").Find(&orders, "client_id = ? AND complete = ? ", client_id, "False")
+	fmt.Println(orders[len(orders)-1], "lennnnnnnn")
 	json.NewEncoder(w).Encode(orders)
 }
 
