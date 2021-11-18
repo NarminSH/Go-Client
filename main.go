@@ -380,7 +380,7 @@ func clientActiveOrders(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(user, "user over herereee")
 	fmt.Println(client.ID, "client id is over here")
 	client_id := client.ID
-	var orders []models.Order
+	var orders models.Order
 	db.Where("client_id = ? AND complete = ? ", client_id, "False").Preload("Items").Find(&orders)
 	json.NewEncoder(w).Encode(orders)
 }
@@ -460,7 +460,7 @@ func main() {
 	// db.Exec("CREATE DATABASE client_db")
 	// db.Exec("USE client_db")
 	db.AutoMigrate(&models.Client{})
-	db.Set("gorm:auto_preload", true)
+	// db.Set("gorm:auto_preload", true)
 	// db.AutoMigrate(&models.Order{})
 	// db.AutoMigrate(&models.Cook{})
 	// db.AutoMigrate(&models.Courier{})
