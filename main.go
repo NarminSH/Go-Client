@@ -381,7 +381,7 @@ func clientActiveOrders(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(client.ID, "client id is over here")
 	client_id := client.ID
 	var orders models.Order
-	db.Where("client_id = ? AND complete = ? ", client_id, "False").Preload("Items").Find(&orders)
+	// db.Where("client_id = ? AND complete = ? ", client_id, "False").Preload("Items").Find(&orders)
 	db.Preload("Items").First(&orders, "client_id = ? AND complete = ? ", client_id, "False")
 
 	// db.Preload("Items").Preload("Orders.OrderItems").Find(&users)
