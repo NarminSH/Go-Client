@@ -103,8 +103,10 @@ func IsAuthorized(handler http.HandlerFunc) http.HandlerFunc {
 			// }
 			var client models.Client
 			Claimed_user := claims["Username"]
+			fmt.Println(Claimed_user, "claimed user")
 			
 			db.Where("username = ? ", Claimed_user).First(&client)
+			fmt.Println(client.ID, "found client id in db")
 			// if err != nil {
 			// 	if err == gorm.ErrRecordNotFound {
 			// 		fmt.Println(err, "firsttt")
