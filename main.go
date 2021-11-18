@@ -460,6 +460,7 @@ func main() {
 	// db.Exec("CREATE DATABASE client_db")
 	// db.Exec("USE client_db")
 	db.AutoMigrate(&models.Client{})
+	db.Set("gorm:auto_preload", true)
 	// db.AutoMigrate(&models.Order{})
 	// db.AutoMigrate(&models.Cook{})
 	// db.AutoMigrate(&models.Courier{})
