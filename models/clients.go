@@ -14,12 +14,12 @@ type Client struct {
 	LastName    string `json:"lastname" gorm:"type:varchar(50); not null"`
 	Patronymic  string `json:"patronymic" gorm:"type:varchar(50)"`
 	Username    string `json:"username" gorm:"unique;not null;type:varchar(50)"`
-	UserType    string  `json:"usertype" gorm:"type:varchar(4)"`
+	UserType    string  `json:"usertype" gorm:"type:varchar(4);"`
 	PhoneNumber string `json:"phone_number" gorm:"type:varchar(20)"`
 	Email       string `json:"email" gorm:"type:varchar(50); not null"`
 	Location    string  `json:"location" gorm:"type:varchar(250)"`
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
+	CreatedAt   time.Time  `json:"created_at"`
+	UpdatedAt   time.Time   `json:"updated_at"`
 }	
 
 

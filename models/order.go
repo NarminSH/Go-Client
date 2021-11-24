@@ -10,7 +10,7 @@ type Order struct {
 	// gorm.Model
 	ID             int64  `json:"Id" gorm:"primary_key"`
 	ClientID       int   `json:"client_id"`
-	// Client        ClientID
+	// Client        Client
 	CookId                int64     `json:"cook_id"`
 	// Cook      []Cook
 	CourierId             int64     `json:"courier_id"`

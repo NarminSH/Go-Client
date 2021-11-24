@@ -57,6 +57,7 @@ func SetError(err Error, message string) Error {
 	err.Warning = message
 	return err
 }
+	
 
 
 func IsAuthorized(handler http.HandlerFunc) http.HandlerFunc {
@@ -82,25 +83,11 @@ func IsAuthorized(handler http.HandlerFunc) http.HandlerFunc {
 			return mySigningKey, nil
 		})
 
-		// if err != nil {
-		// 	var err Error
-		// 	fmt.Println(err, "errrooorrrrr")
-		// 	err = SetError(err, "Your Token has been expired.")
-		// 	json.NewEncoder(w).Encode(err)
-		// 	return
-		// }
-
 		if claims, ok := token.Claims.(jwt.MapClaims); ok{
 			params := mux.Vars(r)
 			requestUser := params["id"]
-			
-			// if r.Method == "POST" {
-			// 	username := claims["Username"] 
-			// 	// Str, _ := username.(string)
-			// 	fmt.Println("username type is", reflect.TypeOf(username))
-			// 	handler.ServeHTTP(w, r)
-			// 	return
-			// }
+		
+		
 			var client models.Client
 			Claimed_user := claims["Username"]
 			fmt.Println(Claimed_user, "claimed user")
@@ -125,13 +112,22 @@ func IsAuthorized(handler http.HandlerFunc) http.HandlerFunc {
 			// fmt.Println(s, "rrrrrrr")
 			// fmt.Println(s, "query resultttttt")
 			client_id := client.ID
-			fmt.Println(client_id, "fffffffffffffff")
+			// fmt.Println(client_id, "fffffffffffffff")
 			var tokenUser string
 			tokenUser = strconv.FormatUint(uint64(client_id), 10)
 			fmt.Println(tokenUser, "ccccccccc")
 
 
 			if tokenUser == requestUser  {
+					// if r.Method == "PUT" {
+					// 	username := claims["Username"] 
+					// 	StringUsername, _ := username.(string)
+					// 	var updatedclient models.Client
+					// 	updatedclient.Username = StringUsername
+					// 	fmt.Println("username type is", reflect.TypeOf(username))
+					// 	handler.ServeHTTP(w, r)
+					// 	return
+					// }
 				fmt.Printf("User is %s ", requestUser)
 				// r.Header.Set("Username", "nermin")
 				handler.ServeHTTP(w, r)
@@ -302,23 +298,45 @@ func createClient(w http.ResponseWriter, r *http.Request) {
 // @Security ApiKeyAuth
 func updateClient(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	params := mux.Vars(r)
-	requestUser := params["id"]
-	fmt.Println(requestUser, "requested user is over hereeeee")
-	id64, err := strconv.ParseUint(requestUser, 10, 64)
-    if err != nil {
-        fmt.Println(err)
-    }
-    currentUser := uint(id64)
+	if r.Header["Authorization"] == nil{
+		var err middleware.Error
+		err = middleware.SetError(err, "No Authorization credentials were provided")
+		json.NewEncoder(w).Encode(err)
+		return
+	}
 
-	var updatedclient models.Client
-	json.NewDecoder(r.Body).Decode(&updatedclient)
-	updatedclient.ID = currentUser
-	db.Where("id = ?", currentUser).Save(&updatedclient)
-	json.NewEncoder(w).Encode(updatedclient)
+	stringToken := r.Header["Authorization"][0]
+	split := strings.Split(stringToken, " ")
+	responseToken := split[1]
+
+	var mySigningKey = []byte(middleware.Secretkey)
+
+	token, _ := jwt.Parse(responseToken, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("There was an error in parsing token.")
+		}
+		return mySigningKey, nil
+	})
+	if claims, ok := token.Claims.(jwt.MapClaims); ok{
+		username := claims["Username"] 
+		StringUsername, _ := username.(string)
+		params := mux.Vars(r)
+		requestUser := params["id"]
+		id64, err := strconv.ParseUint(requestUser, 10, 64)
+		if err != nil {
+			fmt.Println(err)
+		}
+		Userid := uint(id64)
+
+		var updatedclient models.Client
+		json.NewDecoder(r.Body).Decode(&updatedclient)
+		updatedclient.ID = Userid
+		updatedclient.Username = StringUsername
+		fmt.Println(updatedclient.Username)
+		db.Where("id = ?", Userid).Save(&updatedclient)
+		json.NewEncoder(w).Encode(updatedclient)
 }
-
-
+}
 
 
 // DeleteClient godoc
@@ -447,7 +465,7 @@ func clientActiveOrders(w http.ResponseWriter, r *http.Request) {
 // @host 192.168.31.74:8004
 // @BasePath /api/v1.0
 func main() {
-	db, err = gorm.Open("postgres", "host=192.168.31.74  user=lezzetly password=lezzetly123 dbname=db_name port=5432 sslmode=disable Timezone=Asia/Baku")
+	db, err = gorm.Open("postgres", "host=localhost  user=lezzetly password=lezzetly123 dbname=db_name port=5432 sslmode=disable Timezone=Asia/Baku")
 
 	if err != nil {
 		fmt.Println(err, "Error is  here")
