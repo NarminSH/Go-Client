@@ -244,40 +244,60 @@ func createClient(w http.ResponseWriter, r *http.Request) {
 
 	var mySigningKey = []byte(middleware.Secretkey)
 
-	token, _ := jwt.Parse(responseToken, func(token *jwt.Token) (interface{}, error) {
+	token, invalid := jwt.Parse(responseToken, func(token *jwt.Token) (interface{}, error) {
+		fmt.Println("entered token section")
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			fmt.Println("entered token parsing section")
 			return nil, fmt.Errorf("There was an error in parsing token.")
 		}
 		return mySigningKey, nil
 	})
+	if invalid != nil {
+		var err middleware.Error
+			err = middleware.SetError(err, "Token is invalid")
+			json.NewEncoder(w).Encode(err)
+			return
+	}
 
 	if claims, ok := token.Claims.(jwt.MapClaims); ok{
-			fmt.Println(claims, "claims are herererererer")
+			fmt.Println(claims, "claims are hereeeeeeeee")
 			username := claims["Username"] 
+			usertype := claims["Usertype"]
 			StrUsername, _ := username.(string)
-			json.NewDecoder(r.Body).Decode(&newClient)
+			StrUsertype, _ := usertype.(string)
+			if StrUsertype == "3" {
+				json.NewDecoder(r.Body).Decode(&newClient)
 
-			newClient.Username = StrUsername
-			fmt.Println(StrUsername, "usernameee")
-			
-			// newClient.ID = strconv.Itoa(len(clients) + 1)
-			// clients = append(clients, newClient)
-			err := db.Where("username = ? ", StrUsername).First(&newClient).Error
-			fmt.Println(err, "zeroooo")
-			if err != nil {
-				if err == gorm.ErrRecordNotFound {
-					fmt.Println(err, "firsttt")
-					db.Create(&newClient)
-				} 
+				newClient.Username = StrUsername
+				newClient.UserType = StrUsertype
+				fmt.Println(StrUsername, "usernameee")
+				
+				// newClient.ID = strconv.Itoa(len(clients) + 1)
+				// clients = append(clients, newClient)
+				err := db.Where("username = ? ", StrUsername).First(&newClient).Error
+				fmt.Println(err, "zeroooo")
+				if err != nil {
+					if err == gorm.ErrRecordNotFound {
+						fmt.Println(err, "firsttt")
+						db.Create(&newClient)
+					} 
+				} else {
+					fmt.Println(err, "seconddd")
+					var err middleware.Error
+					err = middleware.SetError(err, "User with this username exists")
+					json.NewEncoder(w).Encode(err)
+					return
+				}
+
+				json.NewEncoder(w).Encode((newClient))
 			} else {
-				fmt.Println(err, "seconddd")
-				var err middleware.Error
-				err = middleware.SetError(err, "User with this username exists")
-				json.NewEncoder(w).Encode(err)
-				return
-			}
-
-			json.NewEncoder(w).Encode((newClient))
+					fmt.Println(err, "another type user is trying to create a client")
+					var err middleware.Error
+					err = middleware.SetError(err, "You can not create client with this token")
+					json.NewEncoder(w).Encode(err)
+					return
+			} 
+			
 }
 }
 
@@ -403,49 +423,6 @@ func clientActiveOrders(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(len(orders.Items), "Items are")
 	json.NewEncoder(w).Encode(orders)
 }
-
-
-
-// Orders
-// func createOrder(w http.ResponseWriter, r *http.Request) {
-// 	var neworder models.Order
-// 	json.NewDecoder(r.Body).Decode(&neworder)
-// 	// Creates new order by inserting records in the `orders` and `items` table
-// 	db.Create(&neworder)
-// 	fmt.Println("crerated new order")
-// 	w.Header().Set("Content-Type", "application/json")
-// 	json.NewEncoder(w).Encode(neworder)
-// }
-
-
-// func getOrders(w http.ResponseWriter, r *http.Request) {
-// 	w.Header().Set("Content-Type", "application/json")
-// 	var orders []models.Order
-// 	db.Preload("Items").Find(&orders)
-// 	json.NewEncoder(w).Encode(orders)
-// }
-
-
-
-// func getOrder(w http.ResponseWriter, r *http.Request) {
-// 	w.Header().Set("Content-Type", "application/json")
-// 	params := mux.Vars(r)
-// 	inputOrderID := params["orderId"]
-
-// 	var order models.Order
-// 	db.Preload("Items").First(&order, inputOrderID)
-// 	json.NewEncoder(w).Encode(order)
-// }
-
-// // func updateOrder(w http.ResponseWriter, r *http.Request) {
-// // 	var updatedOrder models.Order
-// // 	json.NewDecoder(r.Body).Decode(&updatedOrder)
-// // 	db.Save(&updatedOrder)
-
-// // 	w.Header().Set("Content-Type", "application/json")
-// // 	json.NewEncoder(w).Encode(updatedOrder)
-// // }
-
 
 
 
