@@ -75,13 +75,19 @@ func IsAuthorized(handler http.HandlerFunc) http.HandlerFunc {
 
 		var mySigningKey = []byte(Secretkey)
 
-		token, err := jwt.Parse(responseToken, func(token *jwt.Token) (interface{}, error) {
+		token, invalid := jwt.Parse(responseToken, func(token *jwt.Token) (interface{}, error) {
 			fmt.Println(token, "Parsed token is over here")
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 				return nil, fmt.Errorf("There was an error in parsing token.")
 			}
 			return mySigningKey, nil
 		})
+		if invalid != nil {
+			var err middleware.Error
+				err = middleware.SetError(err, "Token is invalid")
+				json.NewEncoder(w).Encode(err)
+				return
+		}
 
 		if claims, ok := token.Claims.(jwt.MapClaims); ok{
 			params := mux.Vars(r)
@@ -340,6 +346,8 @@ func updateClient(w http.ResponseWriter, r *http.Request) {
 	if claims, ok := token.Claims.(jwt.MapClaims); ok{
 		username := claims["Username"] 
 		StringUsername, _ := username.(string)
+		usertype := claims["Usertype"]
+		StrUsertype, _ := usertype.(string)
 		params := mux.Vars(r)
 		requestUser := params["id"]
 		id64, err := strconv.ParseUint(requestUser, 10, 64)
@@ -352,7 +360,7 @@ func updateClient(w http.ResponseWriter, r *http.Request) {
 		json.NewDecoder(r.Body).Decode(&updatedclient)
 		updatedclient.ID = Userid
 		updatedclient.Username = StringUsername
-		fmt.Println(updatedclient.Username)
+		updatedclient.UserType = StrUsertype
 		db.Where("id = ?", Userid).Save(&updatedclient)
 		json.NewEncoder(w).Encode(updatedclient)
 }
