@@ -9,6 +9,8 @@ github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578 h1:d+Bc7a5rLufV
 github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578/go.mod h1:uGdkoq3SwY9Y+13GIhn11/XLaGBb4BfwItxLd5jeuXE=
 github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751 h1:JYp7IbQjafoB+tBA3gMyHYHrpOtNuDiK/uB5uXxq5wM=
 github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751/go.mod h1:LOuyumcjzFXgccqObfd/Ljyb9UuFJ6TxHnclSeseNhc=
+github.com/alexliesenfeld/health v0.6.0 h1:HRBTCgybNSe4lqGEk7nU82c3bjwh9W+3b46W6UvD4CQ=
+github.com/alexliesenfeld/health v0.6.0/go.mod h1:N4NDIeQtlWumG+6z1ne1v62eQxktz5ylEgGgH9emdMw=
 github.com/andybalholm/cascadia v1.1.0/go.mod h1:GsXiBklL0woXo1j/WYWtSYYC4ouU9PqHO0sqidkEA4Y=
 github.com/cpuguy83/go-md2man/v2 v2.0.0-20190314233015-f79a8a8ca69d/go.mod h1:maD7wRr/U5Z6m/iR4s+kqSMx2CaBsrgA7czyZG/E6dU=
 github.com/cpuguy83/go-md2man/v2 v2.0.1 h1:r/myEWzV9lfsM1tFLgDyu0atFtJ1fXn261LKYj/3DxU=
@@ -20,6 +22,10 @@ github.com/denisenkom/go-mssqldb v0.0.0-20191124224453-732737034ffd/go.mod h1:xb
 github.com/dgrijalva/jwt-go v3.2.0+incompatible h1:7qlOGliEKZXTDg6OTjfoBKDXWrumCAMpl/TFQ4/5kLM=
 github.com/dgrijalva/jwt-go v3.2.0+incompatible/go.mod h1:E3ru+11k8xSBh+hMPgOLZmtrrCbhqsmaPHjLKYnJCaQ=
 github.com/erikstmartin/go-testdb v0.0.0-20160219214506-8d10e4a1bae5/go.mod h1:a2zkGnVExMxdzMo3M0Hi/3sEU+cWnZpSni0O6/Yb/P0=
+github.com/etherlabsio/healthcheck v0.0.0-20191224061800-dd3d2fd8c3f6 h1:az9jaEKre+mwUWiS9Pl8h1FuOvdiFM7UqplmCmJtHUQ=
+github.com/etherlabsio/healthcheck v0.0.0-20191224061800-dd3d2fd8c3f6/go.mod h1:ZMSmptAGNIg5UAxsJzmw5DMW6uQvxr/hvCklNwtFz1k=
+github.com/etherlabsio/healthcheck/v2 v2.0.0 h1:oKq8cbpwM/yNGPXf2Sff6MIjVUjx/pGYFydWzeK2MpA=
+github.com/etherlabsio/healthcheck/v2 v2.0.0/go.mod h1:huNVOjKzu6FI1eaO1CGD3ZjhrmPWf5Obu/pzpI6/wog=
 github.com/ghodss/yaml v1.0.0 h1:wQHKEahhL6wmXdzwWG11gIVCkOv05bNOh+Rxn0yngAk=
 github.com/ghodss/yaml v1.0.0/go.mod h1:4dBDuWmgqj2HViK6kFavaiC9ZROes6MMH2rRYeMEF04=
 github.com/gin-contrib/gzip v0.0.1/go.mod h1:fGBJBCdt6qCZuCAOwWuFhBB4OOq9EFqlo5dEaFhhu5w=

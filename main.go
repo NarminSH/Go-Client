@@ -2,10 +2,18 @@ package main
 
 //we want to render our data as json
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"strconv"
 	"strings"
+	"time"
+
+	// "clientapi/health"
+	// "clientapi/postgres"
+	"github.com/alexliesenfeld/health"
+	// "github.com/etherlabsio/healthcheck/v2"
+	// "github.com/etherlabsio/healthcheck/v2/checkers"
 
 	"clientapi/middleware"
 	"clientapi/models"
@@ -47,13 +55,11 @@ var Claimed_user string
 
 
 type Error struct {
-	// IsError bool   `json:"isError"`
 	Warning string `json:"warning"`
 }
 
 
 func SetError(err Error, message string) Error {
-	// err.IsError = true
 	err.Warning = message
 	return err
 }
@@ -85,6 +91,7 @@ func IsAuthorized(handler http.HandlerFunc) http.HandlerFunc {
 		if invalid != nil {
 			var err middleware.Error
 				err = middleware.SetError(err, "Token is invalid")
+				fmt.Println(invalid, "invalid token")
 				json.NewEncoder(w).Encode(err)
 				return
 		}
@@ -446,19 +453,25 @@ func clientActiveOrders(w http.ResponseWriter, r *http.Request) {
 //@securityDefinitions.apikey ApiKeyAuth
 //@in header
 //@name Authorization
-
 // @host 192.168.31.74:8004
 // @BasePath /api/v1.0
 func main() {
-	db, err = gorm.Open("postgres", "host=192.168.31.74  user=lezzetly password=lezzetly123 dbname=db_name port=5432 sslmode=disable Timezone=Asia/Baku")
-
+	db, err = gorm.Open("postgres", "host=localhost  user=lezzetly password=lezzetly123 dbname=db_name port=5432 sslmode=disable Timezone=Asia/Baku")
+	fmt.Printf("gorm database type: %T\n", db)
 	if err != nil {
-		fmt.Println(err, "Error is  here")
 		log.Println("Connection Failed to Open")
 	} else {
 		log.Println("Connection Established")
 	}
 
+	sqlDB := db.DB()
+	fmt.Printf("database type: %T\n", sqlDB)
+
+	err = sqlDB.Ping()
+	if err != nil {
+	panic(err)
+	}
+	
 	// Create the database. This is a one-time step.
 	// Comment out if running multiple times - You may see an error otherwise
 	// db.Exec("CREATE DATABASE client_db")
@@ -471,6 +484,42 @@ func main() {
 	// db.Model(&models.Order{}).AddForeignKey("client_id", "clients(id)", "NO ACTION", "NO ACTION")
 
 	router := mux.NewRouter()
+
+	checker := health.NewChecker(
+
+		// Set the time-to-live for our cache to 1 second (default).
+		health.WithCacheDuration(2*time.Second),
+
+		// Configure a global timeout that will be applied to all checks.
+		health.WithTimeout(15*time.Second),
+
+		// A check configuration to see if our database connection is up.
+		// The check function will be executed for each HTTP request.
+		health.WithCheck(health.Check{
+			Name:    "database",      // A unique check name.
+			Timeout: 5 * time.Second, // A check specific timeout.
+			Check:   sqlDB.PingContext,
+		}),
+
+		// The following check will be executed periodically every 15 seconds
+		// started with an initial delay of 3 seconds. The check function will NOT
+		// be executed for each HTTP request.
+		health.WithPeriodicCheck(15*time.Second, 3*time.Second, health.Check{
+			Name: "get",
+			Check:   sqlDB.PingContext,
+		}),
+
+		// Set a status listener that will be invoked when the health status changes.
+		// More powerful hooks are also available (see docs).
+		health.WithStatusListener(func(ctx context.Context, state health.CheckerState) {
+			log.Println(fmt.Sprintf("health status changed to %s", state.Status))
+		}),
+	)
+
+	// Create a new health check http.Handler that returns the health status
+	// serialized as a JSON string. You can pass pass further configuration
+	// options to NewHandler to modify default configuration.
+	router.HandleFunc("/health", health.NewHandler(checker))
 	router.HandleFunc("/api/v1.0/clients", getCLients).Methods("GET")
 	router.HandleFunc("/api/v1.0/clients/{id}", getClient ).Methods("GET")
 	router.HandleFunc("/api/v1.0/clients", createClient).Methods("POST")
@@ -479,14 +528,7 @@ func main() {
 	router.HandleFunc("/api/v1.0/clients/{id}/orders", IsAuthorized(clientOrders)).Methods("GET")
 	router.HandleFunc("/api/v1.0/clients/{id}/active-orders", IsAuthorized(clientActiveOrders)).Methods("GET")
 
-	// router.HandleFunc("/api/v1.0/orders", getOrders).Methods("GET")
-	// router.HandleFunc("/api/v1.0/orders", createOrder).Methods("POST")
-	// router.HandleFunc("/api/v1.0/orders/{orderId}", getOrder).Methods("GET")
-	// router.HandleFunc("/api/v1.0/orderitems", createItem).Methods("POST")
-
-
 	router.PathPrefix("/swagger").Handler(httpSwagger.WrapHandler)
 	log.Fatal(http.ListenAndServe(":8000", router))
-
-
 }
+
