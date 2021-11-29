@@ -5,15 +5,14 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+
+	httpCheck "github.com/hellofresh/health-go/v4/checks/http"
+
 	"strconv"
 	"strings"
 	"time"
 
-	// "clientapi/health"
-	// "clientapi/postgres"
 	"github.com/alexliesenfeld/health"
-	// "github.com/etherlabsio/healthcheck/v2"
-	// "github.com/etherlabsio/healthcheck/v2/checkers"
 
 	"clientapi/middleware"
 	"clientapi/models"
@@ -456,8 +455,7 @@ func clientActiveOrders(w http.ResponseWriter, r *http.Request) {
 // @host 192.168.31.74:8004
 // @BasePath /api/v1.0
 func main() {
-	db, err = gorm.Open("postgres", "host=localhost  user=lezzetly password=lezzetly123 dbname=db_name port=5432 sslmode=disable Timezone=Asia/Baku")
-	fmt.Printf("gorm database type: %T\n", db)
+	db, err = gorm.Open("postgres", "host=192.168.31.74  user=lezzetly password=lezzetly123 dbname=db_name port=5432 sslmode=disable Timezone=Asia/Baku")
 	if err != nil {
 		log.Println("Connection Failed to Open")
 	} else {
@@ -470,7 +468,7 @@ func main() {
 	err = sqlDB.Ping()
 	if err != nil {
 	panic(err)
-	}
+	} 
 	
 	// Create the database. This is a one-time step.
 	// Comment out if running multiple times - You may see an error otherwise
@@ -485,40 +483,42 @@ func main() {
 
 	router := mux.NewRouter()
 
+
 	checker := health.NewChecker(
+		health.WithCacheDuration(10*time.Second),
 
-		// Set the time-to-live for our cache to 1 second (default).
-		health.WithCacheDuration(2*time.Second),
+		health.WithCheck(health.Check{
+			Name:    "getClient",
+			Check:   httpCheck.New(httpCheck.Config{
+			   URL: "http://192.168.31.74:8004/api/v1.0/clients",
+			}),
+		 }),
 
-		// Configure a global timeout that will be applied to all checks.
-		health.WithTimeout(15*time.Second),
+		 health.WithCheck(health.Check{
+			Name:    "getCook",
+			Check:   httpCheck.New(httpCheck.Config{
+			   URL: "http://192.168.31.74/api/v1.0/cooks",
+			}),
+		 }),
 
-		// A check configuration to see if our database connection is up.
-		// The check function will be executed for each HTTP request.
+
 		health.WithCheck(health.Check{
 			Name:    "database",      // A unique check name.
 			Timeout: 5 * time.Second, // A check specific timeout.
 			Check:   sqlDB.PingContext,
 		}),
-
-		// The following check will be executed periodically every 15 seconds
-		// started with an initial delay of 3 seconds. The check function will NOT
-		// be executed for each HTTP request.
-		health.WithPeriodicCheck(15*time.Second, 3*time.Second, health.Check{
-			Name: "get",
-			Check:   sqlDB.PingContext,
-		}),
-
-		// Set a status listener that will be invoked when the health status changes.
-		// More powerful hooks are also available (see docs).
+		// health.WithPeriodicCheck(15*time.Second, 3*time.Second, health.Check{
+		// 	Name:               "get",
+		// 	Check:              sqlDB.PingContext,
+		// 	StatusListener: func(ctx context.Context, name string, state health.CheckState) {
+		// 	},
+		// 	Interceptors: []health.Interceptor{},
+		// }),
 		health.WithStatusListener(func(ctx context.Context, state health.CheckerState) {
 			log.Println(fmt.Sprintf("health status changed to %s", state.Status))
 		}),
 	)
 
-	// Create a new health check http.Handler that returns the health status
-	// serialized as a JSON string. You can pass pass further configuration
-	// options to NewHandler to modify default configuration.
 	router.HandleFunc("/health", health.NewHandler(checker))
 	router.HandleFunc("/api/v1.0/clients", getCLients).Methods("GET")
 	router.HandleFunc("/api/v1.0/clients/{id}", getClient ).Methods("GET")
@@ -531,4 +531,5 @@ func main() {
 	router.PathPrefix("/swagger").Handler(httpSwagger.WrapHandler)
 	log.Fatal(http.ListenAndServe(":8000", router))
 }
+
 

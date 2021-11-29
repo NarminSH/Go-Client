@@ -9,6 +9,7 @@ require (
 
 require (
 	github.com/alexliesenfeld/health v0.6.0 // indirect
+	github.com/dimiro1/health v0.0.0-20191019130555-c5cbb4d46ffc // indirect
 	github.com/etherlabsio/healthcheck/v2 v2.0.0 // indirect
 	github.com/shopspring/decimal v1.3.1 // indirect
 )
@@ -26,9 +27,10 @@ require (
 	github.com/go-openapi/jsonreference v0.19.6 // indirect
 	github.com/go-openapi/spec v0.20.4 // indirect
 	github.com/go-openapi/swag v0.19.15 // indirect
+	github.com/hellofresh/health-go/v4 v4.5.0
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
-	github.com/lib/pq v1.1.1 // indirect
+	github.com/lib/pq v1.10.3 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/shurcooL/sanitized_anchor_name v1.0.0 // indirect
