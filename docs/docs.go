@@ -98,9 +98,9 @@ var doc = `{
                 }
             }
         },
-        "/clients/{username}": {
+        "/clients/{id}": {
             "get": {
-                "description": "get client by username",
+                "description": "get client by id",
                 "tags": [
                     "Clients"
                 ],
@@ -108,8 +108,8 @@ var doc = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Client username",
-                        "name": "username",
+                        "description": "Client id",
+                        "name": "id",
                         "in": "path",
                         "required": true
                     }
@@ -141,7 +141,7 @@ var doc = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Update particular client by username",
+                "description": "Update particular client by id",
                 "consumes": [
                     "application/json"
                 ],
@@ -155,8 +155,8 @@ var doc = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Client username",
-                        "name": "username",
+                        "description": "Client id",
+                        "name": "id",
                         "in": "path",
                         "required": true
                     },
@@ -197,7 +197,7 @@ var doc = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Delete particular client by username",
+                "description": "Delete particular client by id",
                 "consumes": [
                     "application/json"
                 ],
@@ -211,8 +211,8 @@ var doc = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Client username",
-                        "name": "username",
+                        "description": "Client id",
+                        "name": "id",
                         "in": "path",
                         "required": true
                     }
@@ -244,7 +244,7 @@ var doc = `{
         "models.Client": {
             "type": "object",
             "properties": {
-                "createdAt": {
+                "created_at": {
                     "type": "string"
                 },
                 "email": {
@@ -259,16 +259,22 @@ var doc = `{
                 "lastname": {
                     "type": "string"
                 },
+                "location": {
+                    "type": "string"
+                },
                 "patronymic": {
                     "type": "string"
                 },
                 "phone_number": {
                     "type": "string"
                 },
-                "updatedAt": {
+                "updated_at": {
                     "type": "string"
                 },
                 "username": {
+                    "type": "string"
+                },
+                "usertype": {
                     "type": "string"
                 }
             }

@@ -2,7 +2,7 @@ basePath: /api/v1.0
 definitions:
   models.Client:
     properties:
-      createdAt:
+      created_at:
         type: string
       email:
         type: string
@@ -12,13 +12,17 @@ definitions:
         type: integer
       lastname:
         type: string
+      location:
+        type: string
       patronymic:
         type: string
       phone_number:
         type: string
-      updatedAt:
+      updated_at:
         type: string
       username:
+        type: string
+      usertype:
         type: string
     type: object
 host: 192.168.31.74:8004
@@ -76,15 +80,15 @@ paths:
       summary: Create a new client
       tags:
       - Clients
-  /clients/{username}:
+  /clients/{id}:
     delete:
       consumes:
       - application/json
-      description: Delete particular client by username
+      description: Delete particular client by id
       parameters:
-      - description: Client username
+      - description: Client id
         in: path
-        name: username
+        name: id
         required: true
         type: string
       produces:
@@ -108,11 +112,11 @@ paths:
       tags:
       - Clients
     get:
-      description: get client by username
+      description: get client by id
       parameters:
-      - description: Client username
+      - description: Client id
         in: path
-        name: username
+        name: id
         required: true
         type: string
       responses:
@@ -134,11 +138,11 @@ paths:
     put:
       consumes:
       - application/json
-      description: Update particular client by username
+      description: Update particular client by id
       parameters:
-      - description: Client username
+      - description: Client id
         in: path
-        name: username
+        name: id
         required: true
         type: string
       - description: Update Client

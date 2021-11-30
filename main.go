@@ -207,12 +207,12 @@ func getCLients(w http.ResponseWriter, r *http.Request) {
 }
 
 // @Summary Get one client
-// @Description get client by username
+// @Description get client by id
 // @Tags Clients
-// @Param username path string true "Client username"
+// @Param id path string true "Client id"
 // @Success 200 {object} models.Client
 // @Failure 400,404 {object} object
-// @Router /clients/{username} [get]
+// @Router /clients/{id} [get]
 func getClient(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)
@@ -317,15 +317,15 @@ func createClient(w http.ResponseWriter, r *http.Request) {
 
 // UpdateClient godoc
 // @Summary Update particular client
-// @Description Update particular client by username 
+// @Description Update particular client by id 
 // @Tags Clients
 // @Accept  json
 // @Produce  json
-// @Param username path string true "Client username"
+// @Param id path string true "Client id"
 // @Param updatedclient body models.Client true "Update Client"
 // @Success 200 {object} models.Client
 // @Failure 400,404 {object} object
-// @Router /clients/{username} [put]
+// @Router /clients/{id} [put]
 // @Security ApiKeyAuth
 func updateClient(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
@@ -374,14 +374,14 @@ func updateClient(w http.ResponseWriter, r *http.Request) {
 
 // DeleteClient godoc
 // @Summary Delete particular client
-// @Description Delete particular client by username
+// @Description Delete particular client by id
 // @Tags Clients
 // @Accept  json
 // @Produce  json
-// @Param username path string true "Client username"
+// @Param id path string true "Client id"
 // @Success 200 {object} models.Client
 // @Failure 400,404 {object} object
-// @Router /clients/{username} [delete]
+// @Router /clients/{id} [delete]
 // @Security ApiKeyAuth
 func deleteClient(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
