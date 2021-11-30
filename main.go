@@ -204,7 +204,6 @@ func getCLients(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	db.Find(&clients)
 	json.NewEncoder(w).Encode(clients)
-
 }
 
 // @Summary Get one client
@@ -455,7 +454,17 @@ func clientActiveOrders(w http.ResponseWriter, r *http.Request) {
 // @host 192.168.31.74:8004
 // @BasePath /api/v1.0
 func main() {
-	db, err = gorm.Open("postgres", "host=192.168.31.74  user=lezzetly password=lezzetly123 dbname=db_name port=5432 sslmode=disable Timezone=Asia/Baku")
+
+	r := InitRouter()
+
+	log.Fatal(http.ListenAndServe(":8000", r))
+}
+
+
+func InitRouter() *mux.Router{
+
+
+	db, err = gorm.Open("postgres", "host=localhost  user=lezzetly password=lezzetly123 dbname=db_name port=5432 sslmode=disable Timezone=Asia/Baku")
 	if err != nil {
 		log.Println("Connection Failed to Open")
 	} else {
@@ -469,7 +478,7 @@ func main() {
 	if err != nil {
 	panic(err)
 	} 
-	
+
 	// Create the database. This is a one-time step.
 	// Comment out if running multiple times - You may see an error otherwise
 	// db.Exec("CREATE DATABASE client_db")
@@ -481,8 +490,9 @@ func main() {
 	// db.AutoMigrate(&models.Courier{})
 	// db.Model(&models.Order{}).AddForeignKey("client_id", "clients(id)", "NO ACTION", "NO ACTION")
 
-	router := mux.NewRouter()
+	
 
+	router := mux.NewRouter()
 
 	checker := health.NewChecker(
 		health.WithCacheDuration(10*time.Second),
@@ -529,7 +539,7 @@ func main() {
 	router.HandleFunc("/api/v1.0/clients/{id}/active-orders", IsAuthorized(clientActiveOrders)).Methods("GET")
 
 	router.PathPrefix("/swagger").Handler(httpSwagger.WrapHandler)
-	log.Fatal(http.ListenAndServe(":8000", router))
+
+	return router
+
 }
-
-

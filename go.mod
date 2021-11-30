@@ -9,9 +9,13 @@ require (
 
 require (
 	github.com/alexliesenfeld/health v0.6.0 // indirect
+	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dimiro1/health v0.0.0-20191019130555-c5cbb4d46ffc // indirect
 	github.com/etherlabsio/healthcheck/v2 v2.0.0 // indirect
+	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/shopspring/decimal v1.3.1 // indirect
+	github.com/steinfletcher/apitest v1.5.11 // indirect
+	gopkg.in/yaml.v3 v3.0.0-20200615113413-eeeca48fe776 // indirect
 )
 
 require (
@@ -31,9 +35,11 @@ require (
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/lib/pq v1.10.3 // indirect
+	github.com/magiconair/properties v1.8.5
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/shurcooL/sanitized_anchor_name v1.0.0 // indirect
+	github.com/stretchr/testify v1.7.0
 	github.com/swaggo/files v0.0.0-20210815190702-a29dd2bc99b2 // indirect
 	github.com/swaggo/http-swagger v1.1.2
 	github.com/swaggo/swag v1.7.4 // indirect
