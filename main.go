@@ -464,7 +464,7 @@ func main() {
 func InitRouter() *mux.Router{
 
 
-	db, err = gorm.Open("postgres", "host=localhost  user=lezzetly password=lezzetly123 dbname=db_name port=5432 sslmode=disable Timezone=Asia/Baku")
+	db, err = gorm.Open("postgres", "host=192.168.31.74  user=lezzetly password=lezzetly123 dbname=db_name port=5432 sslmode=disable Timezone=Asia/Baku")
 	if err != nil {
 		log.Println("Connection Failed to Open")
 	} else {
